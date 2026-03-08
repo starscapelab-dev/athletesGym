@@ -148,7 +148,12 @@ require_auth();
             <li class="nav-item nav-cart">
                 <a href="<?= BASE_URL ?>cart.php">
                     <i class="fas fa-shopping-cart cart-icon"></i>
-                    <span>Cart (<?= isset($_SESSION['cart_session_id']) ? count(getCartItems($pdo)) : 0 ?>)</span>
+                    <?php
+                    $cartCount = isset($_SESSION['cart_session_id']) ? count(getCartItems($pdo)) : 0;
+                    if ($cartCount > 0):
+                    ?>
+                    <span class="cart-count" id="cart-count" data-count="<?= $cartCount ?>"><?= $cartCount ?></span>
+                    <?php endif; ?>
                 </a>
             </li>
             <li class="nav-item">

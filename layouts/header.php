@@ -136,7 +136,7 @@ require_once __DIR__ . "/config.php";
             <li class="nav-item nav-cart">
                 <a href="<?= BASE_URL ?>cart.php">
                     <i class="fas fa-shopping-cart cart-icon"></i>
-                    <span>Cart (0)</span>
+                    <span class="cart-count" id="cart-count" data-count="0">0</span>
                 </a>
             </li>
             <li class="nav-item">

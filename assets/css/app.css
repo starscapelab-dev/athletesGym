@@ -5772,11 +5772,12 @@ header .navbar .navbar-collapse .navbar-nav .nav-cart a {
     font-family: "Orbitron-VariableFont_wght";
     font-weight: 700;
     font-size: 18px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 0;
     transition: 0.3s ease-in-out;
     padding: 0;
+    position: relative;
 }
 
 header .navbar .navbar-collapse .navbar-nav .nav-cart a:hover {
@@ -5785,20 +5786,30 @@ header .navbar .navbar-collapse .navbar-nav .nav-cart a:hover {
 }
 
 header .navbar .navbar-collapse .navbar-nav .nav-cart .cart-icon {
-    font-size: 20px;
+    font-size: 18px;
 }
 
 header .navbar .navbar-collapse .navbar-nav .nav-cart .cart-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
     background: #dc3545;
     color: #fff;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    min-width: 18px;
+    height: 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
+    padding: 0 4px;
+}
+
+/* Hide cart count when zero */
+header .navbar .navbar-collapse .navbar-nav .nav-cart .cart-count[data-count="0"],
+header .navbar .navbar-collapse .navbar-nav .nav-cart .cart-count:empty {
+    display: none;
 }
 
 /* Mobile Search Icon and Popup */
@@ -5906,7 +5917,20 @@ header .navbar .navbar-collapse .navbar-nav .nav-cart .cart-count {
     header .navbar .navbar-collapse .navbar-nav .nav-cart a {
         text-align: center;
         margin: 10px 0;
-        font-size: 16px;
+        font-size: 18px;
         justify-content: center;
+    }
+
+    header .navbar .navbar-collapse .navbar-nav .nav-cart a:hover {
+        font-size: 20px;
+    }
+
+    header .navbar .navbar-collapse .navbar-nav .nav-cart .cart-icon {
+        font-size: 18px;
+    }
+
+    header .navbar .navbar-collapse .navbar-nav .nav-cart .cart-count {
+        top: -5px;
+        right: -8px;
     }
 }
