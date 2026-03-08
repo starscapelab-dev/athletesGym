@@ -209,18 +209,25 @@ h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link {
 
 .bg-grey {
     background: #e7e7e7;
-    padding: 65px 120px;
+    padding: 65px 120px !important;
+}
+
+/* Override Bootstrap column padding for bg-grey sections */
+.col-md-6.bg-grey {
+    padding: 65px 120px !important;
 }
 
 @media only screen and (max-width: 991px) {
-    .bg-grey {
-        padding: 50px 80px;
+    .bg-grey,
+    .col-md-6.bg-grey {
+        padding: 50px 80px !important;
     }
 }
 
 @media only screen and (max-width: 767px) {
-    .bg-grey {
-        padding: 40px 30px;
+    .bg-grey,
+    .col-md-6.bg-grey {
+        padding: 40px 30px !important;
     }
 }
 
