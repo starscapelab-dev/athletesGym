@@ -44,6 +44,31 @@ $(document).ready(function () {
             $('.navbar-collapse').removeClass('show');
         }
     });
+
+    // Mobile Search Popup functionality
+    $('#mobileSearchBtn').click(function (e) {
+        e.stopPropagation();
+        $('#searchPopup').addClass('active');
+        $('#searchPopup input[name="search"]').focus();
+    });
+
+    $('#closeSearchPopup').click(function () {
+        $('#searchPopup').removeClass('active');
+    });
+
+    // Close search popup when clicking on overlay (not content)
+    $('#searchPopup').click(function (e) {
+        if (e.target === this) {
+            $(this).removeClass('active');
+        }
+    });
+
+    // Close search popup on ESC key
+    $(document).keyup(function (e) {
+        if (e.key === "Escape") {
+            $('#searchPopup').removeClass('active');
+        }
+    });
 })
 
 

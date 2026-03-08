@@ -100,9 +100,12 @@ require_once __DIR__ . "/config.php";
     <header>
         <div class="container-fluid">
            <nav class="navbar navbar-expand-xl">
-    <a class="navbar-brand p-0" href="index.php"> 
-        <img src="<?= BASE_URL ?>/assets/images/logo/logo-white.png" width="300px" alt="Logo"> 
+    <a class="navbar-brand p-0" href="index.php">
+        <img src="<?= BASE_URL ?>/assets/images/logo/logo-white.png" width="300px" alt="Logo">
     </a>
+    <button class="mobile-search-icon" type="button" id="mobileSearchBtn">
+        <i class="fas fa-search"></i>
+    </button>
     <button class="menu-btn collapsed" type="button">
         <span class="hamburger">
             <span class="bar"></span>
@@ -159,3 +162,15 @@ require_once __DIR__ . "/config.php";
         </div>
     </header>
     <!-- Header End -->
+
+    <!-- Mobile Search Popup -->
+    <div class="search-popup-overlay" id="searchPopup">
+        <div class="search-popup-content">
+            <button class="close-search-popup" id="closeSearchPopup">&times;</button>
+            <form action="<?= BASE_URL ?>/shop.php" method="GET">
+                <input type="text" name="search" placeholder="Search products..." autocomplete="off" autofocus>
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+    <!-- Mobile Search Popup End -->
