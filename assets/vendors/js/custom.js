@@ -21,23 +21,29 @@
 /*=====================================================================
 1 - HAMBURGER JS
 =====================================================================*/
-// $('body').on('click', '.menu-btn', function () {
-//     $('.hamburger').toggleClass('active');
-// });
-
-
-// $(document).on('click', '.menu-btn, .hamburger', function () {
-//     $('.hamburger').toggleClass('active'); // Toggle the active class
-//     $('.navbar-collapse').toggleClass('show'); // Toggle visibility of the collapse menu
-// });
 $(document).ready(function () {
-    $('.hamburger').click(function () {
-        $(this).toggleClass("active");
+    // Toggle menu when clicking the menu button or hamburger
+    $('.menu-btn, .hamburger').click(function (e) {
+        e.stopPropagation();
+        $('.hamburger').toggleClass("active");
         $('.navbar-collapse').toggleClass('show');
-    })
-    $('.navbar-collapse').click(function () {
-        $(this).toggleClass('show');
-    })
+    });
+
+    // Close menu when clicking on a nav link (mobile)
+    $('.navbar-nav .nav-link').click(function () {
+        if ($(window).width() < 1200) {
+            $('.hamburger').removeClass('active');
+            $('.navbar-collapse').removeClass('show');
+        }
+    });
+
+    // Close menu when clicking outside
+    $(document).click(function (e) {
+        if (!$(e.target).closest('.navbar').length) {
+            $('.hamburger').removeClass('active');
+            $('.navbar-collapse').removeClass('show');
+        }
+    });
 })
 
 

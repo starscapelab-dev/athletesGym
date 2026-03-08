@@ -80,38 +80,6 @@ require_auth();
   .cart-plus:hover, .cart-minus:hover {
     background: #ddd;
   }
-  .search-box {
-    position: relative;
-    display: inline-block;
-  }
-  .search-box input {
-    padding: 8px 35px 8px 12px;
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 20px;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    width: 200px;
-    transition: all 0.3s;
-  }
-  .search-box input::placeholder {
-    color: rgba(255,255,255,0.7);
-  }
-  .search-box input:focus {
-    outline: none;
-    background: rgba(255,255,255,0.2);
-    width: 250px;
-  }
-  .search-box button {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    padding: 5px 10px;
-  }
   </style>
 </head>
 
@@ -154,7 +122,7 @@ require_auth();
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav navbar-nav-scroll tabActive">
             <li class="nav-item">
-                <a class="nav-link" href="<?= BASE_URL ?>index.php" style="black">Home</a>
+                <a class="nav-link" href="<?= BASE_URL ?>index.php">Home</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?= BASE_URL ?>about-us.php">About</a>
@@ -165,37 +133,24 @@ require_auth();
             <li class="nav-item">
                 <a class="nav-link" href="<?= BASE_URL ?>contact.php">Contact</a>
             </li>
-            <li class="nav-item">
-                <form action="<?= BASE_URL ?>search.php" method="GET" class="search-box">
-                    <input type="text" name="q" placeholder="Search products..." required>
+            <li class="nav-item nav-search" style="position: relative;">
+                <form action="<?= BASE_URL ?>shop.php" method="GET" style="margin: 0;">
+                    <input type="text" name="search" placeholder="Search products..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
                     <button type="submit"><i class="fas fa-search"></i></button>
                 </form>
             </li>
-            <li class="cart-menu">
-            <a href="<?= BASE_URL ?>cart.php" class="cart-link" style="color :rgb(255 255 255)">
-            🛒 Cart (<span id="cart-count"><?= isset($_SESSION['cart_session_id']) ? count(getCartItems($pdo)) : 0 ?></span>)
-            </a>
-            <?php if ($cartCount > 0): ?>
-            <div class="mini-cart">
-                <ul>
-                <?php foreach ($cartItems as $item): ?>
-                    <li>
-                    <?= $item['name'] ?> × <?= $item['quantity'] ?>
-                    (<?= number_format($item['price']*$item['quantity'], 2) ?> QR)
-                    </li>
-                <?php endforeach; ?>
-                </ul>
-                <a href="<?= BASE_URL ?>cart.php" class="btn-secondary">View Cart</a>
-                <a href="<?= BASE_URL ?>checkout.php" class="btn-primary">Checkout</a>
-            </div>
-            <?php endif; ?>
+            <li class="nav-item nav-cart">
+                <a href="<?= BASE_URL ?>cart.php">
+                    <i class="fas fa-shopping-cart cart-icon"></i>
+                    <span>Cart (<?= isset($_SESSION['cart_session_id']) ? count(getCartItems($pdo)) : 0 ?>)</span>
+                </a>
             </li>
             <li class="nav-item">
             <?php if (!empty($_SESSION['user_id'])): ?>
-            <a class="nav-link" href="<?= BASE_URL ?>account/profile.php">My Profile</a>
+                <a class="nav-link" href="<?= BASE_URL ?>account/profile.php">My Profile</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link" href="<?= BASE_URL ?>auth/logout.php" class="logout-link">Logout</a>
+                <a class="nav-link" href="<?= BASE_URL ?>auth/logout.php">Logout</a>
             <?php else: ?>
                 <a class="nav-link" href="<?= BASE_URL ?>auth/login.php">Sign In/Register</a>
             <?php endif; ?>
