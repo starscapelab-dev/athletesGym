@@ -209,7 +209,19 @@ h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link {
 
 .bg-grey {
     background: #e7e7e7;
-    padding: 65px;
+    padding: 65px 120px;
+}
+
+@media only screen and (max-width: 991px) {
+    .bg-grey {
+        padding: 50px 80px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .bg-grey {
+        padding: 40px 30px;
+    }
 }
 
 @media only screen and (max-width: 1399px) {
