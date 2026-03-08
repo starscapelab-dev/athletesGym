@@ -113,16 +113,14 @@ require_once __DIR__ . "/config.php";
                 <a class="nav-link" href="<?= BASE_URL ?>index.php">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="<?= BASE_URL ?>shop.php">Shop</a>
+                <a class="nav-link" href="<?= BASE_URL ?>about-us.php">About</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="<?= BASE_URL ?>about-us.php">About</a>
+                <a class="nav-link" href="<?= BASE_URL ?>shop.php">Shop</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?= BASE_URL ?>contact.php">Contact</a>
             </li>
-        </ul>
-        <ul class="navbar-nav ms-auto navbar-nav-scroll tabActive">
             <li class="nav-item nav-search" style="position: relative;">
                 <form action="<?= BASE_URL ?>shop.php" method="GET" style="margin: 0;">
                     <input type="text" name="search" placeholder="Search products..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
@@ -136,7 +134,7 @@ require_once __DIR__ . "/config.php";
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="<?= BASE_URL ?>auth/login.php">Sign In</a>
+                <a class="nav-link" href="<?= BASE_URL ?>auth/login.php">Sign In/Register</a>
             </li>
         </ul>
         <!-- <div id="mini-cart">
