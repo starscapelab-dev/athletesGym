@@ -28,6 +28,7 @@ require_once __DIR__ . "/../../layouts/config.php";
       <a href="<?= BASE_URL ?>admin/sizes/list.php">Sizes</a>
       <a href="<?= BASE_URL ?>admin/colors/list.php">Colors</a>
       <a href="<?= BASE_URL ?>admin/reviews/list.php">Reviews</a>
+      <a href="<?= BASE_URL ?>admin/change_password.php">Change Password</a>
       <a href="<?= BASE_URL ?>admin/logout.php" class="logout-link">Logout</a>
     </nav>
   </aside>
