@@ -54,7 +54,7 @@
 }
 
 body {
-    font-family: "Nunito-VariableFont_wght";
+    font-family: "Inter", sans-serif;
 }
 
 h1,
@@ -81,14 +81,26 @@ ul {
 }
 
 p {
+    font-family: "Inter", sans-serif;
     font-size: 18px;
-    line-height: 1.4;
+    line-height: 1.6;
+    font-weight: 400;
 }
 
 @media only screen and (max-width: 767px) {
     p {
         font-size: 16px;
     }
+}
+
+/* Apply Inter font to all text elements */
+p, span, div, li, label, input, textarea, select, button {
+    font-family: "Inter", sans-serif;
+}
+
+/* Keep headings with Orbitron */
+h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link {
+    font-family: "Orbitron-VariableFont_wght";
 }
 
 .common-btn {
