@@ -52,7 +52,8 @@ README.md
 *.md
 .claude/
 
-# Large files (over 100MB or 50MB)
-gym.zip
-assets/Archive.zip
-assets/athletes/*.mp4
+# Large backup/archive files
+*.zip
+
+# Large video files (exclude all mp4 except the one needed)
+# Note: commercial BW 1.mp4 is tracked and used in headers
