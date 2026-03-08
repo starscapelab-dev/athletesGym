@@ -22,6 +22,11 @@ function loadEnv($path = __DIR__ . '/../.env') {
             $key = trim($key);
             $value = trim($value);
 
+            // Remove inline comments (anything after # that's not in quotes)
+            if (strpos($value, '#') !== false && !preg_match('/^["\']/', $value)) {
+                $value = trim(explode('#', $value)[0]);
+            }
+
             // Remove quotes if present
             if (preg_match('/^(["\'])(.*)\1$/', $value, $matches)) {
                 $value = $matches[2];
