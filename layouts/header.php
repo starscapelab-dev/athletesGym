@@ -103,16 +103,19 @@ require_once __DIR__ . "/config.php";
     <a class="navbar-brand p-0" href="index.php">
         <img src="<?= BASE_URL ?>/assets/images/logo/logo-white.png" width="300px" alt="Logo">
     </a>
-    <button class="mobile-search-icon" type="button" id="mobileSearchBtn">
-        <i class="fas fa-search"></i>
-    </button>
-    <button class="menu-btn collapsed" type="button">
-        <span class="hamburger">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-        </span>
-    </button>
+    <div class="mobile-nav-icons">
+        <a href="<?= BASE_URL ?>cart.php" class="mobile-cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count" id="mobile-cart-count" data-count="0">0</span>
+        </a>
+        <button class="menu-btn collapsed" type="button">
+            <span class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </span>
+        </button>
+    </div>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav navbar-nav-scroll tabActive">
             <li class="nav-item">
@@ -133,7 +136,7 @@ require_once __DIR__ . "/config.php";
                     <button type="submit"><i class="fas fa-search"></i></button>
                 </form>
             </li>
-            <li class="nav-item nav-cart">
+            <li class="nav-item nav-cart desktop-only">
                 <a href="<?= BASE_URL ?>cart.php">
                     <i class="fas fa-shopping-cart cart-icon"></i>
                     <span class="cart-count" id="cart-count" data-count="0">0</span>

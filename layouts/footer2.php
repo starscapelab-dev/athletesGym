@@ -23,16 +23,18 @@
             <!--Grid column-->
             <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
                 <h5 class="text-uppercase mb-4 pb-1">Contact Us</h5>
-                <!-- <ul class="fa-ul" style="margin-left: 1.65em;"> -->
-                <ul class="fa-ul" style="padding: 0px;">
-                    <li class="mb-3">
-                        <span class="fa-li"><i class="fas fa-home"></i></span><span class="ms-2">G-27, Mamsha Bay, Lusail Marina 12-D, Doha, Qatar.</span>
+                <ul class="contact-list" style="list-style: none; padding: 0; margin: 0;">
+                    <li class="mb-3" style="display: flex; align-items: flex-start; gap: 12px;">
+                        <i class="fas fa-home" style="font-size: 16px; margin-top: 3px; min-width: 20px;"></i>
+                        <span>G-27, Mamsha Bay, Lusail Marina 12-D, Doha, Qatar.</span>
                     </li>
-                    <li class="mb-3">
-                        <span class="fa-li"><i class="fas fa-envelope"></i></span><span class="ms-2">info@athletesgym.qa</span>
+                    <li class="mb-3" style="display: flex; align-items: flex-start; gap: 12px;">
+                        <i class="fas fa-envelope" style="font-size: 16px; margin-top: 3px; min-width: 20px;"></i>
+                        <span>info@athletesgym.qa</span>
                     </li>
-                    <li class="mb-3">
-                        <span class="fa-li"><i class="fas fa-phone"></i></span><span class="ms-2">+974 3999 2247</span>
+                    <li class="mb-3" style="display: flex; align-items: flex-start; gap: 12px;">
+                        <i class="fas fa-phone" style="font-size: 16px; margin-top: 3px; min-width: 20px;"></i>
+                        <span>+974 3999 2247</span>
                     </li>
                 </ul>
             </div>
@@ -49,7 +51,7 @@
             <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
                 <h5 class="text-uppercase mb-4">Viewing hours</h5>
 
-                <table class="table text-center text-white">
+                <table class="table text-left text-white">
                     <tbody class="fw-normal">
                         <tr>
                             <td>Sat - Thu</td>
@@ -74,8 +76,8 @@
 
     <!-- Copyright -->
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
-        © 2024 Copyright:
-        <a class="text-white" href="https://athletesgym.qa/">Athletes Gym</a>
+        
+        <p>© <span id="year"></span> Athletes Gym | All Rights Reserved</p>
     </div>
     <!-- Copyright -->
 </footer>

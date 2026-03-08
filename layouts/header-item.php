@@ -115,16 +115,24 @@ require_auth();
     <a class="navbar-brand p-0" href="index.php">
         <img src="<?= BASE_URL ?>assets/images/logo/logo-white.png" width="300px" alt="Logo">
     </a>
-    <button class="mobile-search-icon" type="button" id="mobileSearchBtn">
-        <i class="fas fa-search"></i>
-    </button>
-    <button class="menu-btn collapsed" type="button">
-        <span class="hamburger">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-        </span>
-    </button>
+    <div class="mobile-nav-icons">
+        <a href="<?= BASE_URL ?>cart.php" class="mobile-cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <?php
+            $cartCount = isset($_SESSION['cart_session_id']) ? count(getCartItems($pdo)) : 0;
+            if ($cartCount > 0):
+            ?>
+            <span class="cart-count" id="mobile-cart-count" data-count="<?= $cartCount ?>"><?= $cartCount ?></span>
+            <?php endif; ?>
+        </a>
+        <button class="menu-btn collapsed" type="button">
+            <span class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </span>
+        </button>
+    </div>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav navbar-nav-scroll tabActive">
             <li class="nav-item">
@@ -145,7 +153,7 @@ require_auth();
                     <button type="submit"><i class="fas fa-search"></i></button>
                 </form>
             </li>
-            <li class="nav-item nav-cart">
+            <li class="nav-item nav-cart desktop-only">
                 <a href="<?= BASE_URL ?>cart.php">
                     <i class="fas fa-shopping-cart cart-icon"></i>
                     <?php

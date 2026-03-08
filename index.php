@@ -115,8 +115,8 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6 d-flex align-items-center bg-grey">
-                    <div class="w100">
-                        <h2 class="mb-0">About US</h2>
+                    <div class="w100 ">
+                        <h2 class="mb-0 ">About US</h2>
                         <p class="fadeInUp pt-3 mb-0">Step into a gym that redefines fitness. We’re more than just a workout space we’re a destination for those who embrace challenges and transform their bodies and minds. Equipped with state-of-the-art machines, top-tier fitness equipment, and a thoughtfully designed environment from the flooring and color scheme to the lighting we offer unparalleled fitness experiences for athletes, beginners, and everyone in between.
 At Athletes Gym, we pride ourselves on being an inclusive space, offering private coaching sessions tailored to your needs. With both male and female personal trainers available, everyone is welcome here, no matter where you are on your fitness journey or what your goals may be.
 </p>
