@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Coming Soon</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@700&family=Oswald:wght@700&family=Bebas+Neue&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="global_container">
+        <!-- Background Layer -->
+        <div class="background-layer"></div>
+
+        <!-- Moving circle that follows the mouse -->
+        <div class="mouse-circle"></div>
+
+        <div class="col-2">
+            <img class="logo" src="images/logo.png" alt="Company Logo">
+
+            <!-- Dynamic countdown clock -->
+            <div class="countdown" id="countdown">
+                <span id="days">79</span> Days, <span id="hours">9</span> Hours, 
+                <span id="minutes">17</span> Minutes, <span id="seconds">49</span> Seconds
+            </div>
+
+            <div class="coming-soon">Coming Soon</div>
+
+            <!-- Email notification section -->
+            <form class="notification" method="post">
+                <div class="input-container">
+                    <input type="email" id="email" class="email-input" placeholder="Email" required>
+                </div>
+                <div class="button-container">
+                    <button type="button" class="notify-btn" aria-label="Notify me when available">Notify Me</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>

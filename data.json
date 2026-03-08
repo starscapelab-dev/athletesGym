@@ -1,0 +1,107 @@
+{
+    "winning": [
+        {
+            "id": "GUggA5",
+            "used": 0,
+            "gift": "01.jpg"
+        },
+        {
+            "id": "MMVjnP",
+            "used": 0,
+            "gift": "02.jpg"
+        },
+        {
+            "id": "jhIs1T",
+            "used": 0,
+            "gift": "01.jpg"
+        },
+        {
+            "id": "rku6yu",
+            "used": 0,
+            "gift": "01.jpg"
+        },
+        {
+            "id": "MW5n8L",
+            "used": 0,
+            "gift": "02.jpg"
+        },
+        {
+            "id": "0JlAkC",
+            "used": 0,
+            "gift": "02.jpg"
+        },
+        {
+            "id": "tqSH8Y",
+            "used": 0,
+            "gift": "02.jpg"
+        },
+        {
+            "id": "XDwFs0",
+            "used": 0,
+            "gift": "03.jpg"
+        },
+        {
+            "id": "5EiMHE",
+            "used": 0,
+            "gift": "03.jpg"
+        },
+        {
+            "id": "oEKyuM",
+            "used": 0,
+            "gift": "03.jpg"
+        },
+        {
+            "id": "1PtWpC",
+            "used": 1,
+            "gift": "04.jpg"
+        },
+        {
+            "id": "Q7C3wj",
+            "used": 0,
+            "gift": "04.jpg"
+        },
+        {
+            "id": "eAjcxE",
+            "used": 0,
+            "gift": "04.jpg"
+        },
+        {
+            "id": "MwkQPX",
+            "used": 0,
+            "gift": "04.jpg"
+        },
+        {
+            "id": "1G2Fcl",
+            "used": 0,
+            "gift": "04.jpg"
+        },
+        {
+            "id": "TeKdZA",
+            "used": 0,
+            "gift": "04.jpg"
+        },
+        {
+            "id": "L3SH7c",
+            "used": 0,
+            "gift": "04.jpg"
+        },
+        {
+            "id": "hAAMnd",
+            "used": 0,
+            "gift": "04.jpg"
+        },
+        {
+            "id": "K4zvQj",
+            "used": 0,
+            "gift": "04.jpg"
+        },
+        {
+            "id": "BuoHMv",
+            "used": 0,
+            "gift": "04.jpg"
+        }
+    ],
+    "0": {
+        "used": 1
+    }
+}

@@ -1,0 +1,5 @@
+﻿{
+  "Description": "Domain ownership verification file for Microsoft 365 - place in the website root",
+  "Domain": "athletesgym.qa",
+  "Id": "ffaf79dc-01f2-4170-8f6a-6d2657a0ec14"
+}

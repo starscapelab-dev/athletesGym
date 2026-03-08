@@ -1,0 +1,210 @@
+/* Basic Reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: #fff;
+    overflow: hidden;
+}
+
+.global_container {
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    position: relative;
+    background-color: #000000;
+    overflow: hidden; /* Prevents overflow of the background */
+}
+
+/* Background Layer */
+.background-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url(images/vector_smart_object.png) no-repeat center center; /* Default background */
+    background-size: cover; /* Ensures the image covers the entire container */
+    clip-path: circle(0px at 50% 50%);
+    transition: transform 0.3s ease; /* Smooth transition for background */
+    z-index: 1; /* Set a lower z-index to be behind the content */
+}
+
+/* Media Query for Mobile Devices */
+@media (max-width: 600px) {
+    .background-layer {
+        background: url(images/mobile.png) no-repeat center center; /* Change background for mobile */
+        background-size: cover; /* Ensure it still covers */
+    }
+}
+
+.col-2 {
+    padding: 20px;
+    border-radius: 10px;
+    position: relative; /* Ensure elements are positioned relative to this container */
+    margin-top: 60px; /* Adjusted margin from top */
+    z-index: 2; /* Ensure this is above the background layer */
+}
+
+.logo {
+    width: 30vw;
+    margin: 0 auto;
+}
+
+.countdown {
+    font-size: 2vw;
+    letter-spacing: 0.5vw;
+    font-weight: 600;
+    /* font-size: 30px; Font size for countdown */
+    margin-top: 6vh;
+    color: #fbfbfb; /* Counter color */
+    text-shadow: 0px 0px 8px #000000;
+    text-transform: uppercase; /* Ensure text is uppercase */
+    font-family: 'OpticianSans', sans-serif; /* Use your OpticianSans font */
+}
+
+.coming-soon {
+    letter-spacing: 0.5vw;
+    font-size: 3vw;
+    margin: 20px 0;
+    text-transform: uppercase; /* Capitalize the text */
+    color: #fefefe; /* Color for "Coming Soon" */
+    text-shadow: 0px 0px 8px #000000;
+    font-family: 'Montserrat', sans-serif; /* Change to your preferred font */
+    font-weight: bold; /* Bold weight for emphasis */
+}
+
+.notification {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center align items vertically */
+    /* margin-top: 20px; Margin above the notification section */
+}
+
+.input-container {
+    width: 50%;
+    text-align: end;
+}
+/* #070707 */
+/* color: #858585; */
+
+.email-input {
+    padding: 1.2vw 1.5vw;
+    font-size: 1vw;
+    border-radius: 30px; /* Increased border radius */
+    border: none;
+    width: 90%; /* Adjust width as needed */
+    background-color: white; /* Background color */
+    color: #070707; /* Text color for input */
+    transition: background-color 0.3s ease;
+}
+
+.email-input::placeholder {
+    color: #858585; /* Placeholder text color */
+}
+
+.email-input:hover{
+    background-color: #070707;
+    color: #858585; 
+}
+input[type="email"].in-circle {
+    background-color: black;
+    color: white;
+}
+.button-container {
+    margin-left: 1vw;
+}
+
+.notify-btn {
+    font-size: 0.9vw;
+    font-weight: 800;
+    letter-spacing: 0.3vw;
+    padding: 0.4vw 1.5vw;
+    background: transparent; /* Transparent background for button */
+    color: #dddddd; /* Text color for button */
+    border: 3px solid #dddddd; /* Border color */
+    border-radius: 20px; /* Border radius */
+    cursor: pointer;
+    text-shadow: 0px 0px 8px #000000;
+    text-transform: uppercase; /* Capitalize text */
+}
+
+/* Optional: Adjust hover effect for button */
+.notify-btn:hover {
+    background-color: rgba(221, 221, 221, 0.1); /* Hover effect */
+}
+
+/* Circle that follows the mouse */
+
+.email-input:-webkit-autofill {
+    background-color: #070707 !important; /* Custom background color */
+    color: #858585 !important; /* Custom text color */
+    -webkit-text-fill-color: #858585 !important; /* Text color for autofill */
+    transition: background-color 5000s ease-in-out 0s; /* Ensures background remains your color */
+}
+
+@media (min-width: 600px) and (max-width: 1024px) {
+    .email-input {
+        font-size: 1.4vw; /* Font size for tablet view */
+    }
+
+    .notify-btn {
+        font-size: 1vw; /* Font size for notify button in tablet view */
+    }
+}
+/* Media query for mobile view */
+@media (max-width: 600px) {
+    .countdown {
+        margin-top: 4vh;
+        font-size: 2.9vw; /* Font size for countdown in mobile view */
+    }
+
+    .coming-soon {
+        /* margin-top: 20px;
+        margin-bottom: 20px; */
+        font-size: 4.5vw; /* Font size for coming-soon text in mobile view */
+    }
+
+    .notify-btn {
+        font-size: 3vw; /* Font size for notify button in mobile view */
+        padding: 2vw 3vw;
+    }
+
+    .email-input {
+        padding: 4.2vw 3.5vw; /* Padding adjustment for email input */
+        font-size: 3.5vw; /* Font size adjustment for email input */
+        width: 100%;
+    }
+    .input-container{
+        margin-bottom: 10px;
+        width: 80%;
+    }
+    .col-2 {
+        /* align-content: space-evenly; */
+        margin-top: 25vh;
+    }
+    .logo {
+        width: 65vw;
+    }
+    .notification{
+        text-align: -webkit-center;
+        display: block;
+    }
+}
+
+@media (max-width: 768px) {
+    .mouse-circle {
+        display: none;
+    }
+    /* Make the circle three times bigger on mobile */
+    .background-layer {
+        clip-path: circle(30vw at 50% 50%); /* Increase size and position it at the center */
+    }
+}

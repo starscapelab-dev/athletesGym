@@ -1,0 +1,69 @@
+const backgroundLayer = document.querySelector('.background-layer');
+const emailInput = document.querySelector('input[type="email"]');
+
+// Countdown Timer
+function updateCountdown() {
+    const targetDate = new Date("Dec 31, 2024 23:59:59").getTime();
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById("days").textContent = days;
+    document.getElementById("hours").textContent = hours;
+    document.getElementById("minutes").textContent = minutes;
+    document.getElementById("seconds").textContent = seconds;
+}
+
+// Update countdown every second
+setInterval(updateCountdown, 1000);
+
+// Initial background effect based on device type
+window.addEventListener('load', () => {
+    const isMobile = window.innerWidth <= 768;
+    backgroundLayer.style.clipPath = isMobile ? 'circle(30vw at 50% 50%)' : 'circle(10vw at 50% 50%)';
+});
+
+// Mousemove event for desktop
+document.addEventListener('mousemove', (e) => {
+    if (window.innerWidth > 768) {
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+        backgroundLayer.style.clipPath = `circle(10vw at ${mouseX}px ${mouseY}px)`;
+    }
+});
+
+// Touch movement for mobile devices
+document.addEventListener('touchmove', (e) => {
+    if (window.innerWidth <= 768) {
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+
+        // Follow the touch position
+        backgroundLayer.style.clipPath = `circle(30vw at ${touchX}px ${touchY}px)`;
+
+        // Check if the touch is within the circle (allowing a margin)
+        const circleRadius = 30 * window.innerWidth / 100; // 30vw in pixels
+        const margin = 20; // Margin area around the circle
+        const distX = touchX - (window.innerWidth / 2);
+        const distY = touchY - (window.innerHeight / 2);
+        const distance = Math.sqrt(distX * distX + distY * distY);
+
+        // Change background color of email input based on touch location with margin
+        if (distance <= (circleRadius / 2) + margin) {
+            emailInput.classList.add('in-circle'); // Add class when in circle or margin
+        } else {
+            emailInput.classList.remove('in-circle'); // Remove class when outside
+        }
+    }
+});
+
+// Hide background effect when mouse leaves (desktop only)
+document.addEventListener('mouseleave', () => {
+    if (window.innerWidth > 768) {
+        backgroundLayer.style.clipPath = 'circle(0px at 50% 50%)';
+    }
+});
