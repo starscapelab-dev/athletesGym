@@ -1,0 +1,299 @@
+═══════════════════════════════════════════════════════════
+  ATHLETES GYM - HOSTINGER DEPLOYMENT GUIDE
+═══════════════════════════════════════════════════════════
+
+📋 PRE-DEPLOYMENT CHECKLIST
+═══════════════════════════════════════════════════════════
+□ Hostinger hosting account active
+□ Domain pointed to Hostinger nameservers
+□ SSL certificate ready (Hostinger provides free SSL)
+□ GitHub repository accessible
+□ Database credentials ready
+□ MyFatoorah production API key
+□ Resend domain verified
+
+═══════════════════════════════════════════════════════════
+🗄️  STEP 1: CREATE DATABASE ON HOSTINGER
+═══════════════════════════════════════════════════════════
+
+1. Log in to Hostinger hPanel (https://hpanel.hostinger.com)
+
+2. Go to "Databases" → "MySQL Databases"
+
+3. Click "Create New Database"
+   - Database Name: athletesgym (Hostinger adds prefix automatically)
+   - Note the full name: u123456789_athletesgym
+
+4. Create Database User:
+   - Username: gymuser (Hostinger adds prefix automatically)
+   - Password: Generate strong password (min 16 characters)
+   - Click "Create"
+
+5. Add User to Database:
+   - Select database: u123456789_athletesgym
+   - Select user: u123456789_gymuser
+   - Grant "ALL PRIVILEGES"
+   - Click "Add"
+
+6. Note down credentials:
+   DB_HOST: localhost
+   DB_NAME: u123456789_athletesgym
+   DB_USER: u123456789_gymuser
+   DB_PASS: your_generated_password
+
+═══════════════════════════════════════════════════════════
+📤 STEP 2: DEPLOY CODE TO HOSTINGER
+═══════════════════════════════════════════════════════════
+
+OPTION A - SSH Deployment (Recommended):
+------------------------------------------
+1. Enable SSH in hPanel:
+   - Go to "Advanced" → "SSH Access"
+   - Enable SSH
+   - Note your SSH details
+
+2. Connect via SSH:
+   ssh u123456789@yourdomain.com
+
+3. Navigate to web root:
+   cd public_html
+
+4. Remove default files (if any):
+   rm -rf *
+   rm -rf .[!.]*  # Remove hidden files except . and ..
+
+5. Clone repository:
+   git clone https://github.com/starscapelab-dev/athletesGym.git .
+
+6. If git is not available, download via wget:
+   wget https://github.com/starscapelab-dev/athletesGym/archive/refs/heads/main.zip
+   unzip main.zip
+   mv athletesGym-main/* ./
+   mv athletesGym-main/.htaccess ./
+   rm -rf athletesGym-main main.zip
+
+
+OPTION B - File Manager Upload:
+------------------------------------------
+1. Download repository as ZIP:
+   - Go to https://github.com/starscapelab-dev/athletesGym
+   - Click "Code" → "Download ZIP"
+
+2. In hPanel, go to "Files" → "File Manager"
+
+3. Navigate to public_html
+
+4. Click "Upload" and upload the ZIP file
+
+5. Right-click ZIP → "Extract"
+
+6. Move all files from extracted folder to public_html root
+
+7. Delete empty folder and ZIP file
+
+═══════════════════════════════════════════════════════════
+⚙️  STEP 3: CONFIGURE ENVIRONMENT
+═══════════════════════════════════════════════════════════
+
+1. In File Manager or SSH, create .env file:
+   nano .env  (in SSH)
+   OR
+   Click "New File" → name it ".env" (in File Manager)
+
+2. Copy content from .env.hostinger file and update:
+
+# Database Configuration
+DB_HOST=localhost
+DB_NAME=u123456789_athletesgym      # Your actual database name
+DB_USER=u123456789_gymuser          # Your actual database user
+DB_PASS=your_actual_password        # Your actual password
+
+# MyFatoorah Payment Gateway
+MYFATOORAH_API_KEY=your_production_api_key_here
+MYFATOORAH_BASE_URL=https://api.myfatoorah.com
+MYFATOORAH_TEST_MODE=false
+
+# Application Settings
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://yourdomain.com      # Your actual domain
+
+# Email Configuration
+RESEND_API_KEY=re_ixYthdmw_AffHsJtwkZs7MXVTtJsiXQJE
+RESEND_FROM_EMAIL=noreply@yourdomain.com
+RESEND_FROM_NAME="Athletes Gym Qatar"
+RESEND_ADMIN_EMAIL=admin@yourdomain.com
+
+# Session & Security
+SESSION_LIFETIME=7200
+SESSION_SECURE=true
+CSRF_TOKEN_NAME=csrf_token
+
+3. Set secure permissions (SSH only):
+   chmod 600 .env
+
+═══════════════════════════════════════════════════════════
+🔒 STEP 4: UPDATE .htaccess FOR PRODUCTION
+═══════════════════════════════════════════════════════════
+
+1. Edit .htaccess file:
+   - Change error document paths from /athletesGym/404.php to /404.php
+   - Uncomment HTTPS redirect section
+
+2. Use the .htaccess.production file provided:
+   cp .htaccess.production .htaccess
+
+═══════════════════════════════════════════════════════════
+💾 STEP 5: IMPORT DATABASE STRUCTURE
+═══════════════════════════════════════════════════════════
+
+1. Export your local database:
+   - Open phpMyAdmin at http://localhost/phpmyadmin
+   - Select database: wkfbjlmy_WPATH
+   - Click "Export" → "Go"
+   - Save SQL file
+
+2. Import to Hostinger:
+
+   OPTION A - phpMyAdmin (Recommended for small DB):
+   - In hPanel, go to "Databases" → "phpMyAdmin"
+   - Select your database
+   - Click "Import"
+   - Choose your SQL file
+   - Click "Go"
+
+   OPTION B - SSH (for large databases):
+   - Upload SQL file to server
+   - Run: mysql -u u123456789_gymuser -p u123456789_athletesgym < database.sql
+   - Enter password when prompted
+
+═══════════════════════════════════════════════════════════
+📁 STEP 6: SET FILE PERMISSIONS
+═══════════════════════════════════════════════════════════
+
+Run these commands via SSH or set in File Manager:
+
+chmod 755 public_html
+chmod 644 .env
+chmod 644 .htaccess
+chmod -R 755 uploads/
+chmod -R 755 logs/
+
+# Create directories if they don't exist:
+mkdir -p uploads logs
+chmod 755 uploads logs
+
+═══════════════════════════════════════════════════════════
+🔐 STEP 7: ENABLE SSL (HTTPS)
+═══════════════════════════════════════════════════════════
+
+1. In hPanel, go to "Security" → "SSL"
+
+2. Install Free SSL Certificate:
+   - Click "Install" next to your domain
+   - Wait 10-15 minutes for activation
+
+3. Force HTTPS:
+   - Already configured in .htaccess.production
+   - Test: visit http://yourdomain.com (should redirect to https://)
+
+═══════════════════════════════════════════════════════════
+✅ STEP 8: POST-DEPLOYMENT VERIFICATION
+═══════════════════════════════════════════════════════════
+
+Test the following:
+
+□ Homepage loads: https://yourdomain.com
+□ Admin panel: https://yourdomain.com/admin
+□ Login works
+□ Registration works
+□ Products display correctly
+□ Cart functionality
+□ Checkout process
+□ Payment gateway (test mode first!)
+□ Email notifications
+□ Images and videos load
+□ Mobile responsiveness
+□ SSL certificate shows padlock icon
+□ No PHP errors displayed
+
+═══════════════════════════════════════════════════════════
+🔧 TROUBLESHOOTING
+═══════════════════════════════════════════════════════════
+
+Issue: 500 Internal Server Error
+Solution:
+- Check .htaccess syntax
+- Verify file permissions
+- Check error logs in hPanel → "Advanced" → "Error Logs"
+
+Issue: Database connection error
+Solution:
+- Verify DB credentials in .env
+- Check database user has ALL privileges
+- Test connection via phpMyAdmin
+
+Issue: Images not loading
+Solution:
+- Check file permissions on uploads/ and assets/
+- Verify paths in code match server structure
+
+Issue: Payment not working
+Solution:
+- Verify MYFATOORAH_API_KEY is production key
+- Set MYFATOORAH_TEST_MODE=false
+- Check MyFatoorah dashboard for test transactions
+
+Issue: Emails not sending
+Solution:
+- Verify Resend domain is verified
+- Check RESEND_FROM_EMAIL domain matches verified domain
+- Test with Resend dashboard first
+
+═══════════════════════════════════════════════════════════
+📊 MONITORING & MAINTENANCE
+═══════════════════════════════════════════════════════════
+
+1. Check error logs regularly:
+   - hPanel → "Advanced" → "Error Logs"
+   - Also check: /logs/php_errors.log
+
+2. Backup database weekly:
+   - Use hPanel → "Databases" → "Backups"
+   - Or set up automatic backups
+
+3. Update code when needed:
+   cd public_html
+   git pull origin main
+
+4. Monitor payment transactions:
+   - MyFatoorah dashboard
+   - Admin panel reports
+
+═══════════════════════════════════════════════════════════
+🆘 NEED HELP?
+═══════════════════════════════════════════════════════════
+
+Hostinger Support:
+- Live Chat: Available 24/7 in hPanel
+- Email: support@hostinger.com
+- Knowledge Base: https://support.hostinger.com
+
+Repository Issues:
+- GitHub: https://github.com/starscapelab-dev/athletesGym/issues
+
+═══════════════════════════════════════════════════════════
+✨ DEPLOYMENT COMPLETE!
+═══════════════════════════════════════════════════════════
+
+Your Athletes Gym website should now be live at:
+https://yourdomain.com
+
+Remember to:
+✓ Keep .env file secure and backed up
+✓ Monitor error logs
+✓ Test all functionality before going fully live
+✓ Set payment gateway to production mode only after testing
+✓ Keep WordPress or any other apps updated (if installed)
+
+═══════════════════════════════════════════════════════════
