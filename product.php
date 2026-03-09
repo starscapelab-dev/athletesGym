@@ -69,6 +69,27 @@ foreach ($variants as $v) {
         <div class="product-info">
             <div class="product-title"><?=htmlspecialchars($product['name'])?></div>
             <div class="product-price">QAR <?=number_format($product['price'],2)?></div>
+            
+            <!-- Stock indicator when less than 5 items -->
+            <?php
+            // Get total stock for this product
+            $stockStmt = $pdo->prepare("SELECT SUM(stock) as total_stock FROM product_variants WHERE product_id = ?");
+            $stockStmt->execute([$product['id']]);
+            $stockResult = $stockStmt->fetch();
+            $totalProductStock = $stockResult['total_stock'] ?? 0;
+            ?>
+            <?php if ($totalProductStock > 0 && $totalProductStock < 5): ?>
+                <div style="margin-top: 12px; padding: 11px 14px; background: #f0f8f5; border-left: 3px solid #2da06a; border-radius: 6px; font-size: 13px; font-weight: 600; color: #1a5e3d; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 17px;">⏱</span>
+                    <span>Only <?= $totalProductStock ?> item<?= $totalProductStock === 1 ? '' : 's' ?> left</span>
+                </div>
+            <?php elseif ($totalProductStock === 0): ?>
+                <div style="margin-top: 12px; padding: 11px 14px; background: #f5f5f5; border-left: 3px solid #999; border-radius: 6px; font-size: 13px; font-weight: 600; color: #666; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 17px;">—</span>
+                    <span>Out of Stock</span>
+                </div>
+            <?php endif; ?>
+            
             <div class="product-description"><?=nl2br(htmlspecialchars($product['description']))?></div>
 
             <div class="product-options">
@@ -96,7 +117,11 @@ foreach ($variants as $v) {
             <!-- Add to Cart -->
             <div class="add-cart-row product" data-id="<?= $product['id'] ?>">
             <div class="add-cart-row " data-id="<?= $v['id'] ?>">
-                <input type="number" class="quantity" value="1" min="1" max="10">
+                <div class="quantity-control">
+                    <button type="button" class="qty-btn qty-minus">−</button>
+                    <input type="number" class="quantity" value="1" min="1" max="10">
+                    <button type="button" class="qty-btn qty-plus">+</button>
+                </div>
                 <input type="hidden" class="variant" value="<?= $v['id'] ?>">
                 <button class="add-to-cart-btn">Add to Cart</button>
             </div>

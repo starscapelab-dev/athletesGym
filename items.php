@@ -92,6 +92,27 @@ $products = $products->fetchAll();
                     <?php endforeach; ?>
                 </div>
                 <?php endif; ?>
+                <!-- Stock indicator when less than 5 items -->
+                <?php
+                // Get total stock for this product
+                $stockStmt = $pdo->prepare("
+                    SELECT SUM(stock) as total_stock
+                    FROM product_variants
+                    WHERE product_id = ?
+                ");
+                $stockStmt->execute([$p['id']]);
+                $stockResult = $stockStmt->fetch();
+                $totalStock = $stockResult['total_stock'] ?? 0;
+                ?>
+                <?php if ($totalStock > 0 && $totalStock < 5): ?>
+                    <div style="margin-top: 8px; padding: 7px 10px; background: #f0f8f5; border-left: 2px solid #2da06a; border-radius: 5px; font-size: 11px; font-weight: 600; color: #1a5e3d; text-align: center;">
+                        ⏱ Only <?= $totalStock ?> left
+                    </div>
+                <?php elseif ($totalStock === 0): ?>
+                    <div style="margin-top: 8px; padding: 7px 10px; background: #f5f5f5; border-left: 2px solid #999; border-radius: 5px; font-size: 11px; font-weight: 600; color: #666; text-align: center;">
+                        Out of Stock
+                    </div>
+                <?php endif; ?>
                 <!-- <input type="hidden" class="quantity" value="1" min="1">
                 <button class="common-btn primary add-to-cart-btn">Add to Cart</button> -->
             </div>

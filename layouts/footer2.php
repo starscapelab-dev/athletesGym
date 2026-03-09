@@ -322,8 +322,21 @@ function updateStockStatus() {
         addBtn.classList.add('btn-disabled');
         addBtn.textContent = "Out of Stock";
         stockStatus.textContent = "This variant is currently unavailable.";
+        stockStatus.style.color = "#666";
+        stockStatus.style.backgroundColor = "#f5f5f5";
         qtyInput.value = 0;
         qtyInput.disabled = true;
+    } else if (stock < 5) {
+        addBtn.disabled = false;
+        addBtn.classList.remove('btn-disabled');
+        addBtn.textContent = "Add to Cart";
+        qtyInput.disabled = false;
+        qtyInput.max = stock; // ✅ limit quantity field dynamically
+        if (parseInt(qtyInput.value) > stock) qtyInput.value = stock;
+        stockStatus.textContent = "⏱ Only " + stock + " item" + (stock === 1 ? "" : "s") + " left";
+        stockStatus.style.color = "#1a5e3d";
+        stockStatus.style.backgroundColor = "#f0f8f5";
+        stockStatus.style.display = "block";
     } else {
         addBtn.disabled = false;
         addBtn.classList.remove('btn-disabled');
@@ -331,7 +344,10 @@ function updateStockStatus() {
         qtyInput.disabled = false;
         qtyInput.max = stock; // ✅ limit quantity field dynamically
         if (parseInt(qtyInput.value) > stock) qtyInput.value = stock;
-        stockStatus.textContent = "In Stock: " + stock;
+        stockStatus.textContent = "In Stock: " + stock + " available";
+        stockStatus.style.color = "#1a5e3d";
+        stockStatus.style.backgroundColor = "#f0f8f5";
+        stockStatus.style.display = "block";
     }
 }
 
@@ -366,6 +382,29 @@ qtyInput.addEventListener('input', () => {
         qtyInput.value = 1;
     }
 });
+
+// ✅ Handle Quantity +/- Buttons
+const qtyMinusBtn = document.querySelector('.qty-minus');
+const qtyPlusBtn = document.querySelector('.qty-plus');
+
+if (qtyMinusBtn && qtyPlusBtn) {
+    qtyMinusBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        let qty = parseInt(qtyInput.value) || 1;
+        if (qty > 1) {
+            qtyInput.value = qty - 1;
+        }
+    });
+
+    qtyPlusBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const stock = variantMap[selectedColor]?.[selectedSize] ?? 10;
+        let qty = parseInt(qtyInput.value) || 1;
+        if (qty < stock) {
+            qtyInput.value = qty + 1;
+        }
+    });
+}
 
 // Initial stock check
 updateStockStatus();
