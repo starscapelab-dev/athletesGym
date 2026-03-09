@@ -880,41 +880,54 @@ HTML;
      * Password reset template
      */
     private function getPasswordResetTemplate($code, $userName) {
+        $styles = $this->getEmailStyles();
+        $header = $this->getEmailHeader('Password Reset Request', 'Security Verification');
+        $footer = $this->getEmailFooter();
+
         return <<<HTML
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
+    {$styles}
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #000; color: white; padding: 20px; text-align: center; }
-        .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
-        .code-box { background: white; border: 2px solid #000; padding: 20px; text-align: center; margin: 20px 0; }
-        .code { font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #000; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        .code-box {
+            background: #f9f9f9;
+            border: 3px solid #000000;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .code {
+            font-family: 'Courier New', monospace;
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #000000;
+            display: block;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>🔐 Password Reset Request</h2>
-        </div>
-        <div class="content">
-            <p>Hi <strong>{$userName}</strong>,</p>
-            <p>We received a request to reset your password. Use the code below:</p>
+    <div class="email-wrapper">
+        {$header}
+        <div class="email-content">
+            <p>Hello <strong>{$userName}</strong>,</p>
+            <p>We received a request to reset your password. Please use the verification code below to proceed:</p>
 
             <div class="code-box">
                 <div class="code">{$code}</div>
-                <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">⏱️ Expires in 10 minutes</p>
+                <p style="margin: 0; color: #666666; font-size: 13px;">This code expires in 10 minutes</p>
             </div>
 
-            <p>If you didn't request this, please ignore this email.</p>
-            <p>For security concerns, contact us at <a href="mailto:info@athletesgym.qa">info@athletesgym.qa</a></p>
+            <div class="alert-box">
+                <p style="margin: 0;"><strong>Security Notice:</strong> If you didn't request this password reset, please ignore this email. Your password will remain unchanged.</p>
+            </div>
+
+            <p>For security assistance, please contact us at <a href="mailto:info@athletesgym.qa">info@athletesgym.qa</a></p>
         </div>
-        <div class="footer">
-            <p>Athletes Gym Qatar</p>
-        </div>
+        {$footer}
     </div>
 </body>
 </html>
@@ -925,42 +938,46 @@ HTML;
      * Welcome email template
      */
     private function getWelcomeTemplate($userName) {
-        $siteUrl = env('APP_URL', 'https://athletesgym.qa');
+        $styles = $this->getEmailStyles();
+        $header = $this->getEmailHeader('Welcome to Athletes Gym', 'Your Account is Ready');
+        $footer = $this->getEmailFooter();
 
         return <<<HTML
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #000; color: white; padding: 20px; text-align: center; }
-        .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
-        .cta-button { display: inline-block; background: #000; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-    </style>
+    {$styles}
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>💪 Welcome to Athletes Gym!</h2>
-        </div>
-        <div class="content">
-            <p>Hi <strong>{$userName}</strong>,</p>
-            <p>Welcome to Athletes Gym Qatar! We're excited to have you join our fitness community.</p>
-            <p>Your account is ready. You can now browse our exclusive products and place orders online.</p>
+    <div class="email-wrapper">
+        {$header}
+        <div class="email-content">
+            <p>Hello <strong>{$userName}</strong>,</p>
+            <p>Thank you for creating an account with Athletes Gym Qatar. We're thrilled to have you join our fitness community.</p>
 
-            <div style="text-align: center;">
-                <a href="{$siteUrl}" class="cta-button">Start Shopping</a>
+            <div class="alert-box">
+                <h3 class="section-title" style="margin: 0 0 10px 0; border: none;">Your Account is Active</h3>
+                <p style="margin: 0;">You can now access all features including our exclusive product catalog, online ordering, and order tracking.</p>
             </div>
 
-            <p>If you have any questions, feel free to reach out to us at <a href="mailto:info@athletesgym.qa">info@athletesgym.qa</a></p>
-            <p>Best regards,<br><strong>Athletes Gym Qatar Team</strong></p>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{$this->siteUrl}" class="btn">Start Shopping</a>
+            </div>
+
+            <h3 class="section-title">What's Next?</h3>
+            <ul style="line-height: 1.8;">
+                <li>Browse our exclusive fitness products and apparel</li>
+                <li>Place orders online with secure checkout</li>
+                <li>Track your order status in real-time</li>
+                <li>Manage your account and preferences</li>
+            </ul>
+
+            <p>If you have any questions or need assistance, our team is here to help. Contact us at <a href="mailto:info@athletesgym.qa">info@athletesgym.qa</a></p>
+
+            <p style="margin-top: 25px;">Best regards,<br><strong>Athletes Gym Qatar Team</strong></p>
         </div>
-        <div class="footer">
-            <p>Athletes Gym Qatar - Your Fitness Journey Starts Here</p>
-        </div>
+        {$footer}
     </div>
 </body>
 </html>
