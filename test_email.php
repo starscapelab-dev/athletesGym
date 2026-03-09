@@ -159,6 +159,23 @@ $TEST_EMAIL = 'your-email@example.com'; // ⚠️ CHANGE THIS TO YOUR EMAIL
                     ]);
                     break;
 
+                case 'order_admin':
+                    echo '<h3>Testing Order Notification to Admin...</h3>';
+                    $result = $emailService->sendOrderNotificationToAdmin([
+                        'order_id' => 'TEST-' . time(),
+                        'customer_email' => $TEST_EMAIL,
+                        'customer_name' => 'Test Customer',
+                        'customer_phone' => '+974 1234 5678',
+                        'customer_address' => '123 Test Street, Doha, Qatar',
+                        'order_date' => date('Y-m-d H:i:s'),
+                        'total' => '250.00',
+                        'items' => [
+                            ['name' => 'Gym T-Shirt', 'quantity' => 2, 'price' => '100.00'],
+                            ['name' => 'Water Bottle', 'quantity' => 3, 'price' => '150.00']
+                        ]
+                    ]);
+                    break;
+
                 case 'password':
                     echo '<h3>Testing Password Reset...</h3>';
                     $result = $emailService->sendPasswordReset($TEST_EMAIL, '123456', 'Test User');
@@ -192,8 +209,9 @@ $TEST_EMAIL = 'your-email@example.com'; // ⚠️ CHANGE THIS TO YOUR EMAIL
         <div class="test-section">
             <h3>Test Email Types</h3>
             <p>Click a button below to send a test email to: <strong><?= htmlspecialchars($TEST_EMAIL) ?></strong></p>
-            <p><small><strong>Note:</strong> Booking and Contact form emails normally go to admin, but will be sent to your test email for testing purposes.</small></p>
+            <p><small><strong>Note:</strong> Booking, Contact, and Order Admin emails normally go to admin, but will be sent to your test email for testing purposes.</small></p>
 
+            <h4>Admin Notifications</h4>
             <form method="POST" style="display: inline;">
                 <input type="hidden" name="test_type" value="booking">
                 <button type="submit" class="btn">📅 Booking Notification</button>
@@ -205,8 +223,14 @@ $TEST_EMAIL = 'your-email@example.com'; // ⚠️ CHANGE THIS TO YOUR EMAIL
             </form>
 
             <form method="POST" style="display: inline;">
+                <input type="hidden" name="test_type" value="order_admin">
+                <button type="submit" class="btn">🛒 Order (Admin)</button>
+            </form>
+
+            <h4 style="margin-top: 20px;">Customer Notifications</h4>
+            <form method="POST" style="display: inline;">
                 <input type="hidden" name="test_type" value="order">
-                <button type="submit" class="btn">🛒 Order Confirmation</button>
+                <button type="submit" class="btn">🛍️ Order Confirmation</button>
             </form>
 
             <form method="POST" style="display: inline;">

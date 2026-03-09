@@ -86,7 +86,7 @@ class SimpleEmailService {
     }
 
     /**
-     * Send order notification to customer
+     * Send order confirmation to customer
      */
     public function sendOrderConfirmation($orderData) {
         $subject = "Order Confirmation #{$orderData['order_id']} - Athletes Gym";
@@ -94,6 +94,21 @@ class SimpleEmailService {
         $message = $this->getOrderTemplate($orderData);
 
         return $this->send($orderData['customer_email'], $subject, $message);
+    }
+
+    /**
+     * Send order notification to admin
+     */
+    public function sendOrderNotificationToAdmin($orderData) {
+        $subject = "New Order #{$orderData['order_id']} - {$orderData['customer_name']}";
+
+        $message = $this->getOrderAdminTemplate($orderData);
+
+        $headers = [
+            'Reply-To' => $orderData['customer_email'] ?? $this->fromEmail
+        ];
+
+        return $this->send($this->adminEmail, $subject, $message, $headers);
     }
 
     /**
@@ -321,6 +336,105 @@ HTML;
     }
 
     /**
+     * Order notification template for admin
+     */
+    private function getOrderAdminTemplate($data) {
+        $orderId = $data['order_id'];
+        $customerName = htmlspecialchars($data['customer_name']);
+        $customerEmail = htmlspecialchars($data['customer_email'] ?? 'Not provided');
+        $customerPhone = htmlspecialchars($data['customer_phone'] ?? 'Not provided');
+        $customerAddress = htmlspecialchars($data['customer_address'] ?? 'Not provided');
+        $total = $data['total'];
+        $items = $data['items'] ?? [];
+        $orderDate = $data['order_date'] ?? date('Y-m-d H:i:s');
+
+        $itemsHtml = '';
+        foreach ($items as $item) {
+            $itemsHtml .= "<tr>
+                <td style='padding: 10px; border-bottom: 1px solid #ddd;'>{$item['name']}</td>
+                <td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: center;'>{$item['quantity']}</td>
+                <td style='padding: 10px; border-bottom: 1px solid #ddd; text-align: right;'>{$item['price']} QR</td>
+            </tr>";
+        }
+
+        return <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #000; color: white; padding: 20px; text-align: center; }
+        .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
+        .field { margin-bottom: 15px; padding: 10px; background: white; border-left: 3px solid #000; }
+        .label { font-weight: bold; color: #000; }
+        .value { margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; background: white; margin: 20px 0; }
+        th { background: #000; color: white; padding: 10px; text-align: left; }
+        .total { font-weight: bold; font-size: 18px; background: #f0f0f0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🛒 New Order Received!</h2>
+            <p>Order #{$orderId}</p>
+        </div>
+        <div class="content">
+            <h3>Customer Information</h3>
+            <div class="field">
+                <div class="label">Name:</div>
+                <div class="value">{$customerName}</div>
+            </div>
+            <div class="field">
+                <div class="label">Email:</div>
+                <div class="value"><a href="mailto:{$customerEmail}">{$customerEmail}</a></div>
+            </div>
+            <div class="field">
+                <div class="label">Phone:</div>
+                <div class="value">{$customerPhone}</div>
+            </div>
+            <div class="field">
+                <div class="label">Address:</div>
+                <div class="value">{$customerAddress}</div>
+            </div>
+            <div class="field">
+                <div class="label">Order Date:</div>
+                <div class="value">{$orderDate}</div>
+            </div>
+
+            <h3>Order Items</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th style="text-align: center;">Qty</th>
+                        <th style="text-align: right;">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {$itemsHtml}
+                    <tr class="total">
+                        <td colspan="2" style="padding: 15px; text-align: right;">Total:</td>
+                        <td style="padding: 15px; text-align: right;">{$total} QR</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Action Required:</strong> Please process this order and contact the customer if needed.</p>
+        </div>
+        <div class="footer">
+            <p>Athletes Gym Qatar - Order Management System</p>
+        </div>
+    </div>
+</body>
+</html>
+HTML;
+    }
+
+    /**
      * Password reset template
      */
     private function getPasswordResetTemplate($code, $userName) {
@@ -434,4 +548,12 @@ function sendBookingNotification($bookingData) {
 function sendContactNotification($formData) {
     $emailService = new SimpleEmailService();
     return $emailService->sendContactForm($formData);
+}
+
+/**
+ * Helper function - Send order notification to admin
+ */
+function sendOrderNotificationToAdmin($orderData) {
+    $emailService = new SimpleEmailService();
+    return $emailService->sendOrderNotificationToAdmin($orderData);
 }
