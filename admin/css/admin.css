@@ -42,6 +42,48 @@ h1, h2, h3, h4, h5, h6, .btn {
   overflow-y: auto;
   box-shadow: 2px 0 15px rgba(0,0,0,0.1);
   z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1001;
+  background: linear-gradient(135deg, #21335b 0%, #1a2847 100%);
+  color: #fff;
+  border: none;
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transform: scale(1.05);
+}
+
+.mobile-menu-toggle i {
+  font-size: 1.3rem;
+}
+
+/* Mobile Overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .admin-sidebar-logo {
@@ -80,9 +122,16 @@ h1, h2, h3, h4, h5, h6, .btn {
   padding: 14px 25px;
   display: flex;
   align-items: center;
+  gap: 12px;
   transition: all 0.3s ease;
   font-weight: 500;
   border-left: 3px solid transparent;
+}
+
+.admin-sidebar a i {
+  font-size: 1.1rem;
+  min-width: 20px;
+  text-align: center;
 }
 
 .admin-sidebar a:hover {
@@ -568,11 +617,31 @@ h1, h2, h3, h4, h5, h6, .btn {
     font-size: 14px;
   }
 
+  /* Mobile Menu Toggle */
+  .mobile-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Hide sidebar by default on mobile */
   .admin-sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    box-shadow: none;
+    width: 280px;
+    height: 100vh;
+    position: fixed;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+    transform: translateX(-100%);
+  }
+
+  /* Show sidebar when active */
+  .admin-sidebar.active {
+    transform: translateX(0);
+  }
+
+  /* Show overlay when sidebar is active */
+  .sidebar-overlay.active {
+    display: block;
+    opacity: 1;
   }
 
   .admin-sidebar-logo img {
@@ -581,7 +650,7 @@ h1, h2, h3, h4, h5, h6, .btn {
 
   .admin-content {
     margin-left: 0;
-    padding: 20px 15px;
+    padding: 70px 15px 20px 15px;
   }
 
   .admin-page-header {
@@ -625,11 +694,33 @@ h1, h2, h3, h4, h5, h6, .btn {
     font-size: 2.5rem;
   }
 
+  /* Better table container for mobile */
+  .table-container,
   .admin-table {
     display: block;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     font-size: 0.85rem;
+    scroll-behavior: smooth;
+  }
+
+  /* Add scroll indicator */
+  .admin-table::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .admin-table::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .admin-table::-webkit-scrollbar-thumb {
+    background: #21335b;
+    border-radius: 4px;
+  }
+
+  .admin-table::-webkit-scrollbar-thumb:hover {
+    background: #1a2847;
   }
 
   .admin-table thead {
@@ -665,6 +756,14 @@ h1, h2, h3, h4, h5, h6, .btn {
     font-weight: 600;
     text-align: left;
     color: #21335b;
+    font-size: 0.85rem;
+  }
+
+  .admin-table tbody td img {
+    max-width: 100%;
+    max-height: 150px;
+    margin: 0 auto;
+    display: block;
   }
 
   .admin-table .actions {
@@ -674,10 +773,15 @@ h1, h2, h3, h4, h5, h6, .btn {
     width: 100%;
     min-width: auto;
     padding: 8px 0;
+    padding-left: 0;
   }
 
   .admin-table .actions .btn {
     width: 100%;
+  }
+
+  .admin-table .actions:before {
+    content: none;
   }
 
   /* Order details grid - mobile */
@@ -713,62 +817,120 @@ h1, h2, h3, h4, h5, h6, .btn {
 /* Small Mobile - 480px and below */
 @media (max-width: 480px) {
   body {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .admin-content {
-    padding: 15px 10px;
+    padding: 60px 12px 20px 12px;
   }
 
   .admin-page-header h1 {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
+    line-height: 1.3;
   }
 
   .admin-form {
     padding: 20px 15px;
+    border-radius: 12px;
   }
 
   .admin-form h1,
   .admin-form h2 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .dashboard-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 
   .stat-value {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 
   .btn {
-    padding: 10px 16px;
-    font-size: 0.9rem;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    min-height: 44px;
   }
 
   .admin-table {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
 
   .admin-table tbody td {
-    padding: 6px 10px;
-    padding-left: 45%;
+    padding: 10px 12px;
+    padding-left: 48%;
+    min-height: 44px;
   }
 
   .admin-table tbody td:before {
-    left: 10px;
-    font-size: 0.75rem;
+    left: 12px;
+    font-size: 0.8rem;
   }
 
   .admin-section-title {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     padding-left: 12px;
     border-left-width: 4px;
   }
 
   .order-section .admin-section-title {
     padding: 15px 20px;
-    font-size: 1rem;
+    font-size: 1.05rem;
+  }
+
+  /* Improve input sizes on small mobile */
+  .admin-form input[type="text"],
+  .admin-form input[type="number"],
+  .admin-form input[type="file"],
+  .admin-form input[type="email"],
+  .admin-form input[type="password"],
+  .admin-form select,
+  .admin-form textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 14px 16px;
+  }
+
+  /* Better spacing for form groups */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  /* Mobile menu toggle position */
+  .mobile-menu-toggle {
+    top: 12px;
+    left: 12px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* === TOUCH IMPROVEMENTS === */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase tap targets for touch devices */
+  .btn {
+    min-height: 44px;
+    padding: 12px 20px;
+  }
+
+  .admin-sidebar a {
+    padding: 18px 25px;
+  }
+
+  .admin-table .actions .btn {
+    min-height: 44px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="date"],
+  select,
+  textarea {
+    min-height: 44px;
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 }
 
