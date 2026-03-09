@@ -1,6 +1,6 @@
-<footer class="text-white text-center text-lg-start">
+<footer class="text-white text-center text-lg-start" style="background-color: #000000; width: 100%; margin: 0; padding: 0;">
     <!-- Grid container -->
-    <div class="container p-4">
+    <div class="container p-4" style="max-width: 1200px; margin: 0 auto;">
         <!--Grid row-->
         <div class="row mt-4">
             <!--Grid column-->
@@ -75,9 +75,8 @@
     <!-- Grid container -->
 
     <!-- Copyright -->
-    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
-        
-        <p>© <span id="year"></span> Athletes Gym | All Rights Reserved</p>
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2); width: 100%;">
+        <p style="margin: 0;">© <span id="year"></span> Athletes Gym | All Rights Reserved</p>
     </div>
     <!-- Copyright -->
 </footer>
