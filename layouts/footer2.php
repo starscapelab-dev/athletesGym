@@ -200,16 +200,23 @@ document.addEventListener("DOMContentLoaded", () => {
       const quantity = productDiv.querySelector(".quantity").value;
       const selectedVariantId = productDiv.querySelector(".variant")?.value || null;
 
+      console.log("Add to Cart clicked:", { productId, quantity, selectedVariantId });
+
+      if (!selectedVariantId) {
+        alert("⚠️ Please select a color and size before adding to cart");
+        return;
+      }
+
       // Send via AJAX
-      fetch("cards/cart_add.php", {
+      fetch("<?= BASE_URL ?>cards/cart_add.php", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          product_id: productId,
-          quantity: quantity,
-          variant_id: selectedVariantId
+          product_id: parseInt(productId),
+          quantity: parseInt(quantity),
+          variant_id: parseInt(selectedVariantId)
         })
       })
       // 👇 parse JSON first
@@ -235,73 +242,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
-/////////////////////////////////////
-
-document.addEventListener("DOMContentLoaded", () => {
-  let selectedColor = document.querySelector(".swatch.selected")?.dataset.color || null;
-  let selectedSize = document.querySelector(".size-btn.selected")?.dataset.size || null;
-
-  const swatches = document.querySelectorAll(".swatch");
-  const sizeBtns = document.querySelectorAll(".size-btn");
-  const variantInput = document.querySelector(".variant");
-  const qtyInput = document.querySelector(".quantity");
-  const stockText = document.querySelector(".stock-status");
-  const addBtn = document.querySelector(".add-to-cart-btn");
-
-  function updateVariant() {
-    if (!selectedColor || !selectedSize) {
-      variantInput.value = "";
-      stockText.textContent = "Please select color and size";
-      stockText.style.color = "gray";
-      addBtn.disabled = true;
-      return;
-    }
-
-    const match = variants.find(v =>
-      v.color.toLowerCase() === selectedColor.toLowerCase() &&
-      v.size.toLowerCase() === selectedSize.toLowerCase()
-    );
-
-    if (match) {
-      variantInput.value = match.id;
-      qtyInput.max = match.stock;
-      addBtn.disabled = match.stock <= 0;
-      stockText.textContent = match.stock > 0
-        ? `In stock: ${match.stock}`
-        : "Out of stock";
-      stockText.style.color = match.stock > 0 ? "green" : "red";
-    } else {
-      variantInput.value = "";
-      qtyInput.max = 1;
-      addBtn.disabled = true;
-      stockText.textContent = "Variant not available";
-      stockText.style.color = "red";
-    }
-  }
-
-  swatches.forEach(swatch => {
-    swatch.addEventListener("click", () => {
-      swatches.forEach(s => s.classList.remove("selected"));
-      swatch.classList.add("selected");
-      selectedColor = swatch.dataset.color;
-      updateVariant();
-    });
-  });
-
-  sizeBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      sizeBtns.forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      selectedSize = btn.dataset.size;
-      updateVariant();
-    });
-  });
-
-  updateVariant(); // Initialize on load
-});
-
 
 /////////////////////////////////////
+
 
 const variantMap = <?= json_encode($variantMap) ?>;
 const variants = <?= json_encode($variants) ?>;
