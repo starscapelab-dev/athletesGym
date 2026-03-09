@@ -52,11 +52,11 @@ foreach ($variants as $v) {
     <div class="product-detail-container">
         <!-- Gallery -->
         <div class="product-gallery">
-            <img id="main-img" class="main-img" src="uploads/<?=htmlspecialchars($images[0] ?? 'no-image.png')?>" alt="<?=htmlspecialchars($product['name'])?>">
+            <img id="main-img" class="main-img" src="<?= BASE_URL ?>uploads/<?=htmlspecialchars($images[0] ?? 'no-image.png')?>" alt="<?=htmlspecialchars($product['name'])?>">
             <?php if (count($images) > 1): ?>
                 <div class="product-thumbs">
                     <?php foreach ($images as $i => $img): ?>
-                        <img src="uploads/<?=htmlspecialchars($img)?>" alt="thumb" class="<?=($i==0?'selected':'')?>" 
+                        <img src="<?= BASE_URL ?>uploads/<?=htmlspecialchars($img)?>" alt="thumb" class="<?=($i==0?'selected':'')?>"
                         onclick="document.getElementById('main-img').src=this.src;
                                  document.querySelectorAll('.product-thumbs img').forEach(img=>img.classList.remove('selected'));
                                  this.classList.add('selected');">
@@ -187,7 +187,7 @@ if ($suggestions): ?>
         <div class="related-card">
           <a href="product.php?id=<?= $s['id'] ?>" style="color: #000000;">
             <div class="related-thumb">
-              <img src="uploads/<?= $s['image_path'] ?>" alt="<?= $s['image_path'] ?>">
+              <img src="<?= BASE_URL ?>uploads/<?= $s['image_path'] ?>" alt="<?= $s['image_path'] ?>">
             </div>
             <div class="related-info">
               <h4><?= $s['name'] ?></h4>

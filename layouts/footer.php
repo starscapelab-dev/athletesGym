@@ -38,11 +38,11 @@
         </div>
     </footer>
     <!-- Footer End -->
-    <script src="assets/vendors/js/jquery.min.js"></script>
-    <script src="assets/vendors/bootstrap/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendors/js/swiper.js"></script>
-    <script src="assets/vendors/js/wow.js"></script>
-    <script src="assets/vendors/js/custom.js"></script>
+    <script src="<?= BASE_URL ?>assets/vendors/js/jquery.min.js"></script>
+    <script src="<?= BASE_URL ?>assets/vendors/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="<?= BASE_URL ?>assets/vendors/js/swiper.js"></script>
+    <script src="<?= BASE_URL ?>assets/vendors/js/wow.js"></script>
+    <script src="<?= BASE_URL ?>assets/vendors/js/custom.js"></script>
 
     <script>
         document.getElementById("year").innerHTML = new Date().getFullYear();

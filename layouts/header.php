@@ -18,23 +18,23 @@ require_once __DIR__ . "/config.php";
     <meta property="og:description"
         content="You are welcome to visit our center where every person is treated with high attention">
     <!-- ADD THEME DESCRIPTION HERE -->
-    <meta property="og:image" content="<?= BASE_URL ?>/assets/images/thumbnail.webp">
+    <meta property="og:image" content="<?= BASE_URL ?>assets/images/thumbnail.webp">
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="theme_url"> <!-- ADD THEME URL HERE -->
     <meta property="twitter:title" content="Gymfit - Aerobics"> <!-- ADD THEME TITLE HERE -->
     <meta property="twitter:description"
         content="You are welcome to visit our center where every person is treated with high attention">
     <!-- ADD THEME DESCRIPTION HERE -->
-    <meta property="twitter:image" content="<?= BASE_URL ?>/assets/images/thumbnail.webp"> <!-- ADD THUMBNAIL PATH HERE -->
+    <meta property="twitter:image" content="<?= BASE_URL ?>assets/images/thumbnail.webp"> <!-- ADD THUMBNAIL PATH HERE -->
 
     <title>Athletes Gym | Qatar</title>
 
-    <link rel="icon" type="image/x-icon" href="<?= BASE_URL ?>/assets/images/favicon.png">
+    <link rel="icon" type="image/x-icon" href="<?= BASE_URL ?>assets/images/favicon.png">
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/vendors/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/vendors/css/swiper.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/vendors/css/animate.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/app.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>assets/vendors/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>assets/vendors/css/swiper.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>assets/vendors/css/animate.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/app.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,7 +80,7 @@ require_once __DIR__ . "/config.php";
             <source src="assets/athletes/commercial BW 1.mp4" type="video/mp4">
         </video> -->
     <video autoplay muted loop playsinline style="object-fit: fill;"     height="70%" width="100%">
-          <source src="<?= BASE_URL ?>/assets/athletes/commercial BW 1.mp4" type="video/mp4">
+          <source src="<?= BASE_URL ?>assets/athletes/commercial BW 1.mp4" type="video/mp4">
      </video>
     <!-- <div class="videoMain">
          <iframe 
@@ -101,7 +101,7 @@ require_once __DIR__ . "/config.php";
         <div class="container-fluid">
            <nav class="navbar navbar-expand-xl">
     <a class="navbar-brand p-0" href="index.php">
-        <img src="<?= BASE_URL ?>/assets/images/logo/logo-white.png" width="300px" alt="Logo">
+        <img src="<?= BASE_URL ?>assets/images/logo/logo-white.png" width="300px" alt="Logo">
     </a>
     <div class="mobile-nav-icons">
         <a href="<?= BASE_URL ?>cart.php" class="mobile-cart-icon">
@@ -170,7 +170,7 @@ require_once __DIR__ . "/config.php";
     <div class="search-popup-overlay" id="searchPopup">
         <div class="search-popup-content">
             <button class="close-search-popup" id="closeSearchPopup">&times;</button>
-            <form action="<?= BASE_URL ?>/shop.php" method="GET">
+            <form action="<?= BASE_URL ?>shop.php" method="GET">
                 <input type="text" name="search" placeholder="Search products..." autocomplete="off" autofocus>
                 <button type="submit"><i class="fas fa-search"></i></button>
             </form>

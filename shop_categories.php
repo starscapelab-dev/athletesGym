@@ -21,11 +21,17 @@ $categories = $stmt->fetchAll();
     <!-- Categories Section -->
     <div class="categories-grid">
       <?php
-      foreach ($categories as $cat): ?>
+      foreach ($categories as $cat):
+        // Handle both old (just filename) and new (full path) image formats
+        $imagePath = $cat['image'];
+        if ($imagePath && strpos($imagePath, 'uploads/') !== 0) {
+          $imagePath = 'uploads/categories/' . $imagePath;
+        }
+      ?>
         <div class="category-card">
           <a href="items.php?category=<?= $cat['id'] ?>" style="color:rgb(0 0 0)">
             <div class="category-thumb">
-              <img src="<?= $cat['image'] ?>" alt="<?= htmlspecialchars($cat['name']) ?>">
+              <img src="<?= BASE_URL ?><?= $imagePath ?>" alt="<?= htmlspecialchars($cat['name']) ?>">
             </div>
             <h3><?= htmlspecialchars($cat['name']) ?></h3>
           </a>
