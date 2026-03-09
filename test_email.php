@@ -6,7 +6,7 @@
  * ⚠️ IMPORTANT: Delete this file after testing!
  */
 
-require_once __DIR__ . '/includes/env.php';
+require_once __DIR__ . '/includes/env_loader.php';
 require_once __DIR__ . '/includes/simple_email_service.php';
 
 // Change this to your email address for testing
