@@ -304,18 +304,29 @@ document.addEventListener("DOMContentLoaded", () => {
 /////////////////////////////////////
 
 const variantMap = <?= json_encode($variantMap) ?>;
+const variants = <?= json_encode($variants) ?>;
 
 let selectedColor = document.querySelector('.swatch.selected')?.dataset.color;
 let selectedSize = document.querySelector('.size-btn.selected')?.dataset.size;
 const stockStatus = document.getElementById('stock-status');
 const addBtn = document.querySelector('.add-to-cart-btn');
 const qtyInput = document.querySelector('.quantity');
+const variantInput = document.querySelector('.variant');
 
 // Update stock info dynamically
 function updateStockStatus() {
     if (!selectedColor || !selectedSize) return;
 
     const stock = variantMap[selectedColor]?.[selectedSize] ?? 0;
+    
+    // ✅ Find and set variant ID
+    const matchingVariant = variants.find(v => 
+        v.color.toLowerCase() === selectedColor.toLowerCase() && 
+        v.size.toLowerCase() === selectedSize.toLowerCase()
+    );
+    if (matchingVariant) {
+        variantInput.value = matchingVariant.id;
+    }
 
     if (stock <= 0) {
         addBtn.disabled = true;

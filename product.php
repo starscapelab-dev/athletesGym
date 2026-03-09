@@ -116,13 +116,12 @@ foreach ($variants as $v) {
 
             <!-- Add to Cart -->
             <div class="add-cart-row product" data-id="<?= $product['id'] ?>">
-            <div class="add-cart-row " data-id="<?= $v['id'] ?>">
                 <div class="quantity-control">
                     <button type="button" class="qty-btn qty-minus">−</button>
                     <input type="number" class="quantity" value="1" min="1" max="10">
                     <button type="button" class="qty-btn qty-plus">+</button>
                 </div>
-                <input type="hidden" class="variant" value="<?= $v['id'] ?>">
+                <input type="hidden" class="variant" value="">
                 <button class="add-to-cart-btn">Add to Cart</button>
             </div>
 
