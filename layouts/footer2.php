@@ -191,6 +191,7 @@
 //   });
 
 document.addEventListener("DOMContentLoaded", () => {
+  // ===== Add to Cart AJAX Handler =====
   const buttons = document.querySelectorAll(".add-to-cart-btn");
 
   buttons.forEach(btn => {
@@ -241,13 +242,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   });
-});
 
-/////////////////////////////////////
-
-document.addEventListener("DOMContentLoaded", () => {
-const variantMap = <?= json_encode($variantMap) ?>;
-const variants = <?= json_encode($variants) ?>;
+  // ===== Variant Selection & Stock Handler =====
+  const variantMap = <?= json_encode($variantMap) ?>;
+  const variants = <?= json_encode($variants) ?>;
 
 let selectedColor = document.querySelector('.swatch.selected')?.dataset.color;
 let selectedSize = document.querySelector('.size-btn.selected')?.dataset.size;
