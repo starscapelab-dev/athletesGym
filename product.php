@@ -130,81 +130,67 @@ foreach ($variants as $v) {
     </div>
 </div>
 
-<div class="reviews-container">
-  <h3>Customer Reviews</h3>
+<div class="container">
+  <div class="reviews-container">
+    <h3>Customer Reviews</h3>
 
-  <?php
-  // Fetch reviews
-  $stmt = $pdo->prepare("SELECT r.*, u.name 
-                         FROM product_reviews r 
-                         LEFT JOIN users u ON r.user_id = u.id
-                         WHERE r.product_id=? AND r.status='approved'
-                         ORDER BY r.created_at DESC");
-  $stmt->execute([$product['id']]);
-  $reviews = $stmt->fetchAll();
+    <?php
+    // Fetch reviews
+    $stmt = $pdo->prepare("SELECT r.*, u.name 
+                           FROM product_reviews r 
+                           LEFT JOIN users u ON r.user_id = u.id
+                           WHERE r.product_id=? AND r.status='approved'
+                           ORDER BY r.created_at DESC");
+    $stmt->execute([$product['id']]);
+    $reviews = $stmt->fetchAll();
 
-  if ($reviews): ?>
-    <div class="reviews-list">
-      <?php foreach ($reviews as $rev): ?>
-        <div class="review-item">
-          <div class="review-header">
-            <strong><?= htmlspecialchars($rev['full_name'] ?? 'Guest User') ?></strong>
-            <?php if ($rev['is_verified']): ?>
-              <span class="verified-badge">✔ Verified Purchase</span>
-            <?php endif; ?>
+    if ($reviews): ?>
+      <div class="reviews-list">
+        <?php foreach ($reviews as $rev): ?>
+          <div class="review-item">
+            <div class="review-header">
+              <strong><?= htmlspecialchars($rev['full_name'] ?? 'Guest User') ?></strong>
+              <?php if ($rev['is_verified']): ?>
+                <span class="verified-badge">✔ Verified Purchase</span>
+              <?php endif; ?>
+            </div>
+            <div class="review-stars">
+              <?php for ($i=1; $i<=5; $i++): ?>
+                <span class="star <?= ($i <= $rev['rating']) ? 'filled' : '' ?>">★</span>
+              <?php endfor; ?>
+            </div>
+            <p class="review-text"><?= nl2br(htmlspecialchars($rev['review_text'])) ?></p>
+            <small><?= date('d M Y', strtotime($rev['created_at'])) ?></small>
           </div>
-          <div class="review-stars">
-            <?php for ($i=1; $i<=5; $i++): ?>
-              <span class="star <?= ($i <= $rev['rating']) ? 'filled' : '' ?>">★</span>
-            <?php endfor; ?>
-          </div>
-          <p class="review-text"><?= nl2br(htmlspecialchars($rev['review_text'])) ?></p>
-          <small><?= date('d M Y', strtotime($rev['created_at'])) ?></small>
+        <?php endforeach; ?>
+      </div>
+    <?php else: ?>
+      <p>No reviews yet. Be the first to leave one!</p>
+    <?php endif; ?>
+  </div>
+
+  <!-- Review Form -->
+  <?php if (isset($_SESSION['user_id'])): ?>
+    <div class="review-form">
+      <h4>Write a Review</h4>
+      <form method="post" action="review_submit.php">
+        <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+        <div class="rating-stars">
+          <?php for ($i=1; $i<=5; $i++): ?>
+            <input type="radio" name="rating" id="star<?=$i?>" value="<?=$i?>" required>
+            <label for="star<?=$i?>">★</label>
+          <?php endfor; ?>
         </div>
-      <?php endforeach; ?>
+        <textarea name="review_text" placeholder="Write your review..." required></textarea>
+        <button type="submit" class="btn-primary">Submit Review</button>
+      </form>
     </div>
   <?php else: ?>
-    <p>No reviews yet. Be the first to leave one!</p>
-  <?php endif; ?>
+    <p>Sign in to leave a review.</p>
+  <?php 
+  endif; 
+  ?>
 </div>
-
-<!-- Review Form -->
-<?php if (isset($_SESSION['user_id'])): ?>
-  <div class="review-form">
-    <h4>Write a Review</h4>
-    <form method="post" action="review_submit.php">
-      <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
-      <div class="rating-stars">
-        <?php for ($i=1; $i<=5; $i++): ?>
-          <input type="radio" name="rating" id="star<?=$i?>" value="<?=$i?>" required>
-          <label for="star<?=$i?>">★</label>
-        <?php endfor; ?>
-      </div>
-      <textarea name="review_text" placeholder="Write your review..." required></textarea>
-      <button type="submit" class="btn-primary">Submit Review</button>
-    </form>
-  </div>
-<?php else: ?>
-  <p>Sign in to leave a review.</p>
-<?php 
-endif; 
-
-// Fetch suggested products (same category or gender)
-$suggestionsStmt = $pdo->prepare("
-  SELECT a1.id, a1.name, a1.price, a2.image_path
-  FROM products a1 left join product_images a2 on a1.id = a2.product_id
-  WHERE a1.id != ? AND (a1.category_id = ? OR a1.gender = ?)
-  ORDER BY RAND()
-  LIMIT 4
-");
-
-$suggestionsStmt->execute([$product['id'], $product['category_id'], $product['gender']]);
-$suggestions = $suggestionsStmt->fetchAll();
-
-
-if ($suggestions): ?>
-<section class="related-products">
-  <div class="container">
     <h3 class="related-title">You May Also Like</h3>
     <div class="related-grid">
       <?php foreach ($suggestions as $s): ?>

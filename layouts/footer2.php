@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /////////////////////////////////////
 
-
+document.addEventListener("DOMContentLoaded", () => {
 const variantMap = <?= json_encode($variantMap) ?>;
 const variants = <?= json_encode($variants) ?>;
 
@@ -363,6 +363,7 @@ if (qtyMinusBtn && qtyPlusBtn) {
 // Initial stock check
 updateStockStatus();
 
+}); // END DOMContentLoaded
 
 </script>
 </body>
