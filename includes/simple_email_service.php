@@ -226,7 +226,7 @@ class SimpleEmailService {
             <div class='footer-links'>
                 <a href='{$this->siteUrl}'>Visit Website</a> |
                 <a href='mailto:info@athletesgym.qa'>Contact Us</a> |
-                <a href='tel:+974XXXXXXXX'>+974 XXXX XXXX</a>
+                <a href='tel:+97439992247'>+974 3999 2247</a>
             </div>
             <p class='footer-text' style='margin-top: 15px; font-size: 12px; color: #999999;'>
                 © " . date('Y') . " Athletes Gym Qatar. All rights reserved.
