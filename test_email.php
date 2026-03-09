@@ -112,6 +112,10 @@ $TEST_EMAIL = 'your-email@example.com'; // ⚠️ CHANGE THIS TO YOUR EMAIL
         // Handle form submissions
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $testType = $_POST['test_type'] ?? '';
+
+            // Temporarily override admin email for testing
+            $_ENV['MAIL_ADMIN_ADDRESS'] = $TEST_EMAIL;
+
             $emailService = new SimpleEmailService();
             $result = false;
 
@@ -188,6 +192,7 @@ $TEST_EMAIL = 'your-email@example.com'; // ⚠️ CHANGE THIS TO YOUR EMAIL
         <div class="test-section">
             <h3>Test Email Types</h3>
             <p>Click a button below to send a test email to: <strong><?= htmlspecialchars($TEST_EMAIL) ?></strong></p>
+            <p><small><strong>Note:</strong> Booking and Contact form emails normally go to admin, but will be sent to your test email for testing purposes.</small></p>
 
             <form method="POST" style="display: inline;">
                 <input type="hidden" name="test_type" value="booking">
