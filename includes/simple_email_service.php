@@ -9,6 +9,7 @@ class SimpleEmailService {
     private $fromEmail;
     private $fromName;
     private $adminEmail;
+    private $bccEmail;
     private $siteUrl;
     private $logoUrl;
 
@@ -16,7 +17,8 @@ class SimpleEmailService {
         // These will be sent "from" your domain automatically
         $this->fromEmail = env('MAIL_FROM_ADDRESS', 'noreply@athletesgym.qa');
         $this->fromName = env('MAIL_FROM_NAME', 'Athletes Gym Qatar');
-        $this->adminEmail = env('MAIL_ADMIN_ADDRESS', 'info@athletesgym.qa');
+        $this->adminEmail = env('MAIL_ADMIN_ADDRESS', 'athletesgymqa@gmail.com');
+        $this->bccEmail = env('MAIL_BCC_ADDRESS', 'info@akshayvt.com');
         $this->siteUrl = env('APP_URL', 'https://athletesgym.qa');
         $this->logoUrl = $this->siteUrl . '/assets/images/logo/logo-white.png';
     }
@@ -265,6 +267,11 @@ class SimpleEmailService {
             $headers[] = "Reply-To: {$customHeaders['Reply-To']}";
         }
 
+        // BCC for admin emails
+        if (isset($customHeaders['BCC']) && $customHeaders['BCC'] === true) {
+            $headers[] = "BCC: {$this->bccEmail}";
+        }
+
         // Content type
         $headers[] = "Content-Type: text/html; charset=UTF-8";
         $headers[] = "MIME-Version: 1.0";
@@ -281,7 +288,8 @@ class SimpleEmailService {
         $message = $this->getBookingTemplate($bookingData);
 
         $headers = [
-            'Reply-To' => $bookingData['email']
+            'Reply-To' => $bookingData['email'],
+            'BCC' => true
         ];
 
         return $this->send($this->adminEmail, $subject, $message, $headers);
@@ -296,7 +304,8 @@ class SimpleEmailService {
         $message = $this->getContactTemplate($formData);
 
         $headers = [
-            'Reply-To' => $formData['email']
+            'Reply-To' => $formData['email'],
+            'BCC' => true
         ];
 
         return $this->send($this->adminEmail, $subject, $message, $headers);
@@ -322,7 +331,8 @@ class SimpleEmailService {
         $message = $this->getOrderAdminTemplate($orderData);
 
         $headers = [
-            'Reply-To' => $orderData['customer_email'] ?? $this->fromEmail
+            'Reply-To' => $orderData['customer_email'] ?? $this->fromEmail,
+            'BCC' => true
         ];
 
         return $this->send($this->adminEmail, $subject, $message, $headers);
