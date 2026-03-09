@@ -362,60 +362,64 @@ class SimpleEmailService {
         $time = htmlspecialchars($data['time'] ?? 'Not specified');
         $message = nl2br(htmlspecialchars($data['message'] ?? 'No message'));
 
+        $styles = $this->getEmailStyles();
+        $header = $this->getEmailHeader('New Booking Request', 'Booking System Notification');
+        $footer = $this->getEmailFooter();
+
         return <<<HTML
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #000; color: white; padding: 20px; text-align: center; }
-        .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
-        .field { margin-bottom: 15px; padding: 10px; background: white; border-left: 3px solid #000; }
-        .label { font-weight: bold; color: #000; }
-        .value { margin-top: 5px; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-    </style>
+    {$styles}
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>🏋️ New Booking Request</h2>
+    <div class="email-wrapper">
+        {$header}
+        <div class="email-content">
+            <p>A new booking request has been submitted:</p>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Customer Name</div>
+                    <div class="info-value">{$name}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value"><a href="mailto:{$email}">{$email}</a></div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value">{$phone}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Service Requested</div>
+                    <div class="info-value">{$service}</div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Preferred Date</div>
+                    <div class="info-value">{$date}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Preferred Time</div>
+                    <div class="info-value">{$time}</div>
+                </div>
+            </div>
+
+            <div class="alert-box">
+                <div class="info-label">Customer Message</div>
+                <div class="info-value">{$message}</div>
+            </div>
+
+            <p style="margin-top: 20px;"><strong>Action Required:</strong> Please contact the customer to confirm their booking.</p>
         </div>
-        <div class="content">
-            <div class="field">
-                <div class="label">Name:</div>
-                <div class="value">{$name}</div>
-            </div>
-            <div class="field">
-                <div class="label">Email:</div>
-                <div class="value"><a href="mailto:{$email}">{$email}</a></div>
-            </div>
-            <div class="field">
-                <div class="label">Phone:</div>
-                <div class="value">{$phone}</div>
-            </div>
-            <div class="field">
-                <div class="label">Service:</div>
-                <div class="value">{$service}</div>
-            </div>
-            <div class="field">
-                <div class="label">Preferred Date:</div>
-                <div class="value">{$date}</div>
-            </div>
-            <div class="field">
-                <div class="label">Preferred Time:</div>
-                <div class="value">{$time}</div>
-            </div>
-            <div class="field">
-                <div class="label">Message:</div>
-                <div class="value">{$message}</div>
-            </div>
-        </div>
-        <div class="footer">
-            <p>Athletes Gym Qatar - Booking System</p>
-        </div>
+        {$footer}
     </div>
 </body>
 </html>
@@ -431,48 +435,49 @@ HTML;
         $phone = htmlspecialchars($data['phone'] ?? 'Not provided');
         $message = nl2br(htmlspecialchars($data['message']));
 
+        $styles = $this->getEmailStyles();
+        $header = $this->getEmailHeader('New Contact Form', 'Website Inquiry');
+        $footer = $this->getEmailFooter();
+
         return <<<HTML
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #000; color: white; padding: 20px; text-align: center; }
-        .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
-        .field { margin-bottom: 15px; padding: 10px; background: white; border-left: 3px solid #000; }
-        .label { font-weight: bold; color: #000; }
-        .value { margin-top: 5px; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-    </style>
+    {$styles}
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>📧 New Contact Form Submission</h2>
+    <div class="email-wrapper">
+        {$header}
+        <div class="email-content">
+            <p>A new contact form has been submitted from your website:</p>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Name</div>
+                    <div class="info-value">{$name}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value"><a href="mailto:{$email}">{$email}</a></div>
+                </div>
+            </div>
+
+            <div class="info-grid" style="grid-template-columns: 1fr;">
+                <div class="info-box">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value">{$phone}</div>
+                </div>
+            </div>
+
+            <div class="alert-box">
+                <div class="info-label">Message</div>
+                <div class="info-value">{$message}</div>
+            </div>
+
+            <p style="margin-top: 20px;"><strong>Action Required:</strong> Please respond to this inquiry promptly.</p>
         </div>
-        <div class="content">
-            <div class="field">
-                <div class="label">Name:</div>
-                <div class="value">{$name}</div>
-            </div>
-            <div class="field">
-                <div class="label">Email:</div>
-                <div class="value"><a href="mailto:{$email}">{$email}</a></div>
-            </div>
-            <div class="field">
-                <div class="label">Phone:</div>
-                <div class="value">{$phone}</div>
-            </div>
-            <div class="field">
-                <div class="label">Message:</div>
-                <div class="value">{$message}</div>
-            </div>
-        </div>
-        <div class="footer">
-            <p>Athletes Gym Qatar - Contact Form</p>
-        </div>
+        {$footer}
     </div>
 </body>
 </html>
