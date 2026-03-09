@@ -509,22 +509,129 @@ HTML;
         $itemsHtml = '';
         foreach ($items as $item) {
             $itemName = htmlspecialchars($item['name']);
-            $itemSKU = isset($item['sku']) ? '<br><small style="color: #666;">SKU: ' . htmlspecialchars($item['sku']) . '</small>' : '';
-            $itemSize = isset($item['size']) ? '<br><small style="color: #666;">Size: ' . htmlspecialchars($item['size']) . '</small>' : '';
-            $itemColor = isset($item['color']) ? '<br><small style="color: #666;">Color: ' . htmlspecialchars($item['color']) . '</small>' : '';
+            $itemSKU = isset($item['sku']) ? '<br><small style="color: #888;">SKU: ' . htmlspecialchars($item['sku']) . '</small>' : '';
+            $itemSize = isset($item['size']) ? '<br><small style="color: #888;">Size: ' . htmlspecialchars($item['size']) . '</small>' : '';
+            $itemColor = isset($item['color']) ? '<br><small style="color: #888;">Color: ' . htmlspecialchars($item['color']) . '</small>' : '';
             $itemQty = intval($item['quantity']);
             $itemPrice = number_format(floatval($item['price']), 2);
             $itemTotal = number_format(floatval($item['price']) * $itemQty, 2);
 
             $itemsHtml .= "<tr>
-                <td style='padding: 12px; border-bottom: 1px solid #ddd;'>
-                    {$itemName}{$itemSKU}{$itemSize}{$itemColor}
-                </td>
-                <td style='padding: 12px; border-bottom: 1px solid #ddd; text-align: center;'>{$itemQty}</td>
-                <td style='padding: 12px; border-bottom: 1px solid #ddd; text-align: right;'>{$itemPrice} QR</td>
-                <td style='padding: 12px; border-bottom: 1px solid #ddd; text-align: right;'>{$itemTotal} QR</td>
+                <td>{$itemName}{$itemSKU}{$itemSize}{$itemColor}</td>
+                <td style='text-align: center;'>{$itemQty}</td>
+                <td style='text-align: right;'>{$itemPrice} QR</td>
+                <td style='text-align: right;'>{$itemTotal} QR</td>
             </tr>";
         }
+
+        $styles = $this->getEmailStyles();
+        $header = $this->getEmailHeader('Order Confirmation', "Order #{$orderId}");
+        $footer = $this->getEmailFooter();
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    {$styles}
+</head>
+<body>
+    <div class="email-wrapper">
+        {$header}
+        <div class="email-content">
+            <div class="status-badge">{$orderStatus}</div>
+
+            <p>Hello <strong>{$customerName}</strong>,</p>
+            <p>Thank you for your order. We're preparing your items for delivery.</p>
+
+            <h3 class="section-title">Order Information</h3>
+
+            <div class="info-grid" style="grid-template-columns: 1fr;">
+                <div class="info-box">
+                    <div class="info-label">Order Date</div>
+                    <div class="info-value">{$orderDate}</div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Payment Method</div>
+                    <div class="info-value">{$paymentMethod}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Order Status</div>
+                    <div class="info-value">{$orderStatus}</div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Shipping Address</div>
+                    <div class="info-value">{$shippingAddress}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Billing Address</div>
+                    <div class="info-value">{$billingAddress}</div>
+                </div>
+            </div>
+
+            <h3 class="section-title">Order Items</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th style="text-align: center; width: 80px;">Qty</th>
+                        <th style="text-align: right; width: 100px;">Price</th>
+                        <th style="text-align: right; width: 100px;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {$itemsHtml}
+HTML;
+
+        $html .= "<tr><td colspan='3' style='text-align: right; padding-top: 20px;'><strong>Subtotal:</strong></td>";
+        $html .= "<td style='text-align: right; padding-top: 20px;'><strong>" . number_format($subtotal, 2) . " QR</strong></td></tr>";
+
+        if ($shippingFee > 0) {
+            $html .= "<tr><td colspan='3' style='text-align: right;'>Shipping Fee:</td>";
+            $html .= "<td style='text-align: right;'>" . number_format($shippingFee, 2) . " QR</td></tr>";
+        }
+
+        if ($tax > 0) {
+            $html .= "<tr><td colspan='3' style='text-align: right;'>Tax:</td>";
+            $html .= "<td style='text-align: right;'>" . number_format($tax, 2) . " QR</td></tr>";
+        }
+
+        if ($discount > 0) {
+            $html .= "<tr><td colspan='3' style='text-align: right; color: #28a745;'>Discount:</td>";
+            $html .= "<td style='text-align: right; color: #28a745;'>-" . number_format($discount, 2) . " QR</td></tr>";
+        }
+
+        $html .= "<tr class='total-row'><td colspan='3' style='text-align: right;'>Total Amount:</td>";
+        $html .= "<td style='text-align: right;'>" . number_format($total, 2) . " QR</td></tr>";
+
+        $html .= "
+                </tbody>
+            </table>
+
+            <div class='alert-box'>
+                <h3 class='section-title' style='margin: 0 0 10px 0; border: none; font-size: 16px;'>What's Next?</h3>
+                <ul style='margin: 0; padding-left: 20px; line-height: 1.8;'>
+                    <li>You'll receive a shipping confirmation once your order is dispatched</li>
+                    <li>Track your order status in your account dashboard</li>
+                    <li>Estimated delivery: 2-5 business days</li>
+                </ul>
+            </div>
+
+            <p style='margin-top: 25px;'>If you have any questions about your order, please contact us at <a href='mailto:info@athletesgym.qa'>info@athletesgym.qa</a></p>
+        </div>
+        {$footer}
+    </div>
+</body>
+</html>";
+
+        return $html;
+    }
 
         return <<<HTML
 <!DOCTYPE html>
@@ -553,7 +660,7 @@ HTML;
 <body>
     <div class="container">
         <div class="header">
-            <h2>🎉 Order Confirmed!</h2>
+            <h2>Order Confirmed</h2>
             <p style="margin: 10px 0 5px 0;">Order #{$orderId}</p>
             <span class="status-badge">{$orderStatus}</span>
         </div>
@@ -684,23 +791,169 @@ HTML;
         $itemsHtml = '';
         foreach ($items as $item) {
             $itemName = htmlspecialchars($item['name']);
-            $itemSKU = isset($item['sku']) ? '<br><small style="color: #666;">SKU: ' . htmlspecialchars($item['sku']) . '</small>' : '';
-            $itemSize = isset($item['size']) ? '<br><small style="color: #666;">Size: ' . htmlspecialchars($item['size']) . '</small>' : '';
-            $itemColor = isset($item['color']) ? '<br><small style="color: #666;">Color: ' . htmlspecialchars($item['color']) . '</small>' : '';
-            $itemCategory = isset($item['category']) ? '<br><small style="color: #666;">Category: ' . htmlspecialchars($item['category']) . '</small>' : '';
+            $itemSKU = isset($item['sku']) ? '<br><small style="color: #888;">SKU: ' . htmlspecialchars($item['sku']) . '</small>' : '';
+            $itemSize = isset($item['size']) ? '<br><small style="color: #888;">Size: ' . htmlspecialchars($item['size']) . '</small>' : '';
+            $itemColor = isset($item['color']) ? '<br><small style="color: #888;">Color: ' . htmlspecialchars($item['color']) . '</small>' : '';
+            $itemCategory = isset($item['category']) ? '<br><small style="color: #888;">Category: ' . htmlspecialchars($item['category']) . '</small>' : '';
             $itemQty = intval($item['quantity']);
             $itemPrice = number_format(floatval($item['price']), 2);
             $itemTotal = number_format(floatval($item['price']) * $itemQty, 2);
 
             $itemsHtml .= "<tr>
-                <td style='padding: 12px; border-bottom: 1px solid #ddd;'>
-                    {$itemName}{$itemSKU}{$itemSize}{$itemColor}{$itemCategory}
-                </td>
-                <td style='padding: 12px; border-bottom: 1px solid #ddd; text-align: center;'>{$itemQty}</td>
-                <td style='padding: 12px; border-bottom: 1px solid #ddd; text-align: right;'>{$itemPrice} QR</td>
-                <td style='padding: 12px; border-bottom: 1px solid #ddd; text-align: right;'>{$itemTotal} QR</td>
+                <td>{$itemName}{$itemSKU}{$itemSize}{$itemColor}{$itemCategory}</td>
+                <td style='text-align: center;'>{$itemQty}</td>
+                <td style='text-align: right;'>{$itemPrice} QR</td>
+                <td style='text-align: right;'>{$itemTotal} QR</td>
             </tr>";
         }
+
+        $styles = $this->getEmailStyles();
+        $header = $this->getEmailHeader('New Order Received', "Order #{$orderId}");
+        $footer = $this->getEmailFooter();
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    {$styles}
+</head>
+<body>
+    <div class="email-wrapper">
+        {$header}
+        <div class="email-content">
+            <div class="status-badge">{$orderStatus}</div>
+
+            <div class="alert-box">
+                <p style="margin: 0;"><strong>Action Required:</strong> A new order has been placed. Please review and process this order promptly.</p>
+            </div>
+
+            <h3 class="section-title">Order Details</h3>
+
+            <div class="info-grid" style="grid-template-columns: 1fr;">
+                <div class="info-box">
+                    <div class="info-label">Order Date & Time</div>
+                    <div class="info-value">{$orderDate}</div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Payment Method</div>
+                    <div class="info-value">{$paymentMethod}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Order Status</div>
+                    <div class="info-value">{$orderStatus}</div>
+                </div>
+            </div>
+
+            <h3 class="section-title">Customer Information</h3>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Name</div>
+                    <div class="info-value">{$customerName}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Email</div>
+                    <div class="info-value"><a href="mailto:{$customerEmail}">{$customerEmail}</a></div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value"><a href="tel:{$customerPhone}">{$customerPhone}</a></div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Shipping Address</div>
+                    <div class="info-value">{$shippingAddress}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Billing Address</div>
+                    <div class="info-value">{$billingAddress}</div>
+                </div>
+            </div>
+HTML;
+
+        if (!empty($orderNotes)) {
+            $html .= "
+            <div class='info-grid' style='grid-template-columns: 1fr;'>
+                <div class='info-box'>
+                    <div class='info-label'>Order Notes</div>
+                    <div class='info-value'>{$orderNotes}</div>
+                </div>
+            </div>";
+        }
+
+        $html .= "
+            <h3 class='section-title'>Order Items</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Details</th>
+                        <th style='text-align: center; width: 80px;'>Qty</th>
+                        <th style='text-align: right; width: 100px;'>Unit Price</th>
+                        <th style='text-align: right; width: 100px;'>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {$itemsHtml}";
+
+        $html .= "<tr><td colspan='3' style='text-align: right; padding-top: 20px;'><strong>Subtotal:</strong></td>";
+        $html .= "<td style='text-align: right; padding-top: 20px;'><strong>" . number_format($subtotal, 2) . " QR</strong></td></tr>";
+
+        if ($shippingFee > 0) {
+            $html .= "<tr><td colspan='3' style='text-align: right;'>Shipping Fee:</td>";
+            $html .= "<td style='text-align: right;'>" . number_format($shippingFee, 2) . " QR</td></tr>";
+        }
+
+        if ($tax > 0) {
+            $html .= "<tr><td colspan='3' style='text-align: right;'>Tax / VAT:</td>";
+            $html .= "<td style='text-align: right;'>" . number_format($tax, 2) . " QR</td></tr>";
+        }
+
+        if ($discount > 0) {
+            $html .= "<tr><td colspan='3' style='text-align: right; color: #28a745;'>Discount Applied:</td>";
+            $html .= "<td style='text-align: right; color: #28a745;'>-" . number_format($discount, 2) . " QR</td></tr>";
+        }
+
+        $html .= "<tr class='total-row'><td colspan='3' style='text-align: right;'>Total Amount:</td>";
+        $html .= "<td style='text-align: right;'>" . number_format($total, 2) . " QR</td></tr>";
+
+        $html .= "
+                </tbody>
+            </table>
+
+            <div class='alert-box'>
+                <h3 class='section-title' style='margin: 0 0 10px 0; border: none; font-size: 16px;'>Next Steps</h3>
+                <ul style='margin: 0; padding-left: 20px; line-height: 1.8;'>
+                    <li>Verify order details and customer information</li>
+                    <li>Check product availability and stock levels</li>
+                    <li>Process payment (if applicable)</li>
+                    <li>Prepare items for packaging and shipment</li>
+                    <li>Update order status in admin panel</li>
+                    <li>Send shipping confirmation to customer</li>
+                </ul>
+            </div>
+
+            <p style='text-align: center; margin: 25px 0 0 0;'>
+                <strong>Customer Contact:</strong><br>
+                Email: <a href='mailto:{$customerEmail}'>{$customerEmail}</a><br>
+                Phone: <a href='tel:{$customerPhone}'>{$customerPhone}</a>
+            </p>
+        </div>
+        {$footer}
+    </div>
+</body>
+</html>";
+
+        return $html;
+    }
 
         $return = <<<HTML
 <!DOCTYPE html>
@@ -729,37 +982,37 @@ HTML;
 <body>
     <div class="container">
         <div class="header">
-            <h2>🛒 NEW ORDER RECEIVED!</h2>
+            <h2>NEW ORDER RECEIVED</h2>
             <p style="margin: 10px 0 5px 0; font-size: 20px;">Order #{$orderId}</p>
             <span class="status-badge">{$orderStatus}</span>
         </div>
 
         <div class="alert">
-            <strong>⚠️ Action Required:</strong> A new order has been placed. Please review and process this order promptly.
+            <strong>Action Required:</strong> A new order has been placed. Please review and process this order promptly.
         </div>
 
         <div class="content">
-            <h3 style="color: #dc3545; margin-bottom: 15px;">📋 Order Details</h3>
+            <h3 style="color: #dc3545; margin-bottom: 15px;">Order Details</h3>
 
             <div class="info-grid" style="grid-template-columns: 1fr;">
                 <div class="info-box">
-                    <div class="info-label">📅 Order Date & Time</div>
+                    <div class="info-label">Order Date & Time</div>
                     <div class="info-value">{$orderDate}</div>
                 </div>
             </div>
 
             <div class="info-grid">
                 <div class="info-box">
-                    <div class="info-label">💳 Payment Method</div>
+                    <div class="info-label">Payment Method</div>
                     <div class="info-value">{$paymentMethod}</div>
                 </div>
                 <div class="info-box">
-                    <div class="info-label">📊 Order Status</div>
+                    <div class="info-label">Order Status</div>
                     <div class="info-value">{$orderStatus}</div>
                 </div>
             </div>
 
-            <h3 style="color: #dc3545; margin: 25px 0 15px 0;">👤 Customer Information</h3>
+            <h3 style="color: #dc3545; margin: 25px 0 15px 0;">Customer Information</h3>
 
             <div class="info-grid">
                 <div class="info-box">
@@ -767,25 +1020,25 @@ HTML;
                     <div class="info-value">{$customerName}</div>
                 </div>
                 <div class="info-box">
-                    <div class="info-label">📧 Email</div>
+                    <div class="info-label">Email</div>
                     <div class="info-value"><a href="mailto:{$customerEmail}">{$customerEmail}</a></div>
                 </div>
             </div>
 
             <div class="info-grid" style="grid-template-columns: 1fr;">
                 <div class="info-box">
-                    <div class="info-label">📱 Phone</div>
+                    <div class="info-label">Phone</div>
                     <div class="info-value"><a href="tel:{$customerPhone}">{$customerPhone}</a></div>
                 </div>
             </div>
 
             <div class="info-grid">
                 <div class="info-box">
-                    <div class="info-label">📦 Shipping Address</div>
+                    <div class="info-label">Shipping Address</div>
                     <div class="info-value">{$shippingAddress}</div>
                 </div>
                 <div class="info-box">
-                    <div class="info-label">💰 Billing Address</div>
+                    <div class="info-label">Billing Address</div>
                     <div class="info-value">{$billingAddress}</div>
                 </div>
             </div>
@@ -848,7 +1101,7 @@ HTML;
             </table>
 
             <div style='background: #d1ecf1; border-left: 4px solid #17a2b8; padding: 15px; margin: 20px 0;'>
-                <strong>📋 Next Steps:</strong>
+                <strong>Next Steps:</strong>
                 <ul style='margin: 10px 0 0 0; padding-left: 20px;'>
                     <li>Verify order details and customer information</li>
                     <li>Check product availability and stock levels</li>
