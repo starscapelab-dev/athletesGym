@@ -70,7 +70,7 @@ $products = $products->fetchAll();
                 data-price="<?= $p['price'] ?>"
                 data-size="">
                 <a href="product.php?id=<?= $p['id'] ?>" class="img-wrapper" style="color:rgb(0 0 0)">
-                    <img loading='lazy' src="<?= BASE_URL ?>uploads/<?= htmlspecialchars($p['main_image']) ?: 'no-image.png' ?>" alt="<?= htmlspecialchars($p['name']) ?>">
+                    <img loading='lazy' src="<?= getProductImageUrl($p['main_image'], BASE_URL) ?>" alt="<?= htmlspecialchars($p['name']) ?>">
                 </a>
                 <div class="info">
                     <span><?= number_format($p['price'],2) ?> QR</span>
