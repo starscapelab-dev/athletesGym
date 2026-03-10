@@ -686,19 +686,6 @@
                         <a href="about-us.php" class="common-btn primary wow fadeInUp">Add To Cart</a>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="blog-wrapper wow fadeInUp">
-                        <a href="blog.html" class="img-wrapper">
-                            <img loading='lazy' src="assets/images/products/4.png" alt="blog" width="316px"
-                                height="316px">
-                        </a>
-                        <div class="info">
-                            <span>350 QR</span>
-                        </div>
-                        <h2>Athlets GYM Glasses</h2>
-                        <a href="about-us.php" class="common-btn primary wow fadeInUp">Add To Cart</a>
-                    </div>
-                </div>
             </div>
 
             <div class="text-center d-block d-lg-none mt-3">

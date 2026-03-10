@@ -18,7 +18,13 @@ if (!$order) {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT * FROM order_items WHERE order_id=?");
+$stmt = $pdo->prepare("
+  SELECT oi.*, pi.image_path
+  FROM order_items oi
+  LEFT JOIN product_images pi ON oi.product_id = pi.product_id
+  WHERE oi.order_id = ?
+  GROUP BY oi.id
+");
 $stmt->execute([$id]);
 $items = $stmt->fetchAll();
 ?>
@@ -97,6 +103,7 @@ $items = $stmt->fetchAll();
   <table class="admin-table">
     <thead>
       <tr>
+        <th>Image</th>
         <th>Product</th>
         <th>Variant</th>
         <th>Qty</th>
@@ -107,6 +114,13 @@ $items = $stmt->fetchAll();
     <tbody>
       <?php foreach ($items as $item): ?>
       <tr>
+        <td style="text-align: center;">
+          <?php if ($item['image_path']): ?>
+            <img src="<?= BASE_URL ?>uploads/<?= htmlspecialchars($item['image_path']) ?>" alt="<?= htmlspecialchars($item['product_name']) ?>" style="max-width: 60px; max-height: 60px; border-radius: 4px;">
+          <?php else: ?>
+            <span style="color: #999; font-size: 12px;">No image</span>
+          <?php endif; ?>
+        </td>
         <td><?= htmlspecialchars($item['product_name']) ?></td>
         <td><?= htmlspecialchars($item['color']) ?> / <?= htmlspecialchars($item['size']) ?></td>
         <td><?= $item['quantity'] ?></td>

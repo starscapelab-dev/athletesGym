@@ -83,6 +83,29 @@ require_auth();
   .cart-plus:hover, .cart-minus:hover {
     background: #ddd;
   }
+  
+  /* Cart message animations */
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
   </style>
 </head>
 
@@ -120,10 +143,8 @@ require_auth();
             <i class="fas fa-shopping-cart"></i>
             <?php
             $cartCount = isset($_SESSION['cart_session_id']) ? count(getCartItems($pdo)) : 0;
-            if ($cartCount > 0):
             ?>
-            <span class="cart-count" id="mobile-cart-count" data-count="<?= $cartCount ?>"><?= $cartCount ?></span>
-            <?php endif; ?>
+            <span class="cart-count" id="mobile-cart-count" data-count="<?= $cartCount ?>" <?php echo $cartCount === 0 ? 'style="display:none;"' : ''; ?>><?= $cartCount ?></span>
         </a>
         <button class="menu-btn collapsed" type="button">
             <span class="hamburger">
@@ -158,10 +179,8 @@ require_auth();
                     <i class="fas fa-shopping-cart cart-icon"></i>
                     <?php
                     $cartCount = isset($_SESSION['cart_session_id']) ? count(getCartItems($pdo)) : 0;
-                    if ($cartCount > 0):
                     ?>
-                    <span class="cart-count" id="cart-count" data-count="<?= $cartCount ?>"><?= $cartCount ?></span>
-                    <?php endif; ?>
+                    <span class="cart-count" id="cart-count" data-count="<?= $cartCount ?>" <?php echo $cartCount === 0 ? 'style="display:none;"' : ''; ?>><?= $cartCount ?></span>
                 </a>
             </li>
             <li class="nav-item">

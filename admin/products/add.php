@@ -10,35 +10,57 @@ require_once __DIR__ . '/../../includes/csrf.php';
 
 $error = "";
 $success = "";
+$field_errors = [];
+$form_data = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     requireCsrfToken();
-    $name = trim($_POST['name']);
-    $description = trim($_POST['description']);
-    $category_id = (int)$_POST['category_id'];
-    $gender = $_POST['gender'];
-    $price = floatval($_POST['price']);
-    $track_stock = isset($_POST['track_stock']) ? 1 : 0;
-    $low_stock_threshold = (int)($_POST['low_stock_threshold'] ?? 5);
-    $featured = isset($_POST['featured']) ? 1 : 0;
+    
+    // Collect form data for re-population
+    $form_data = [
+        'name' => trim($_POST['name'] ?? ''),
+        'description' => trim($_POST['description'] ?? ''),
+        'category_id' => (int)($_POST['category_id'] ?? 0),
+        'gender' => $_POST['gender'] ?? 'Accessories',
+        'price' => (!empty($_POST['price']) ? floatval($_POST['price']) : ''),
+        'track_stock' => isset($_POST['track_stock']) ? 1 : 0,
+        'low_stock_threshold' => (int)($_POST['low_stock_threshold'] ?? 5),
+        'featured' => isset($_POST['featured']) ? 1 : 0,
+        'variants' => $_POST['variants'] ?? []
+    ];
 
-    if ($name === '' || $price <= 0 || !$category_id) {
-        $error = "All fields are required.";
+    // Field-level validation
+    if (empty($form_data['name'])) {
+        $field_errors['name'] = "Product name is required.";
+    }
+    
+    if (empty($form_data['category_id'])) {
+        $field_errors['category_id'] = "Please select a category.";
+    }
+    
+    if (empty($form_data['price'])) {
+        $field_errors['price'] = "Price is required.";
+    } elseif ($form_data['price'] <= 0) {
+        $field_errors['price'] = "Price must be greater than 0.";
+    }
+
+    if (!empty($field_errors)) {
+        $error = "Please fix the validation errors below.";
     } else {
         try {
             // Start transaction
             $pdo->beginTransaction();
             
             // Create product
-            $stmt = $pdo->prepare("INSERT INTO products (name, description, category_id, gender, price, track_stock, low_stock_threshold, featured) VALUES (?,?,?,?,?,?,?,?)");
-            $stmt->execute([$name, $description, $category_id, $gender, $price, $track_stock, $low_stock_threshold, $featured]);
+            $stmt = $pdo->prepare("INSERT INTO products (name, description, category_id, gender, price, track_stock, low_stock_threshold, featured, active) VALUES (?,?,?,?,?,?,?,?,?)");
+            $stmt->execute([$form_data['name'], $form_data['description'], $form_data['category_id'], $form_data['gender'], $form_data['price'], $form_data['track_stock'], $form_data['low_stock_threshold'], $form_data['featured'], 1]);
             $product_id = $pdo->lastInsertId();
             
             // Add variants if provided
-            if (!empty($_POST['variants'])) {
+            if (!empty($form_data['variants'])) {
                 $variantStmt = $pdo->prepare("INSERT INTO product_variants (product_id, size_id, color_id, sku, stock, price) VALUES (?, ?, ?, ?, ?, ?)");
                 
-                foreach ($_POST['variants'] as $variant) {
+                foreach ($form_data['variants'] as $variant) {
                     $size_id = (int)($variant['size_id'] ?? 0);
                     $color_id = (int)($variant['color_id'] ?? 0);
                     $sku = trim($variant['sku'] ?? '');
@@ -415,6 +437,20 @@ require_once __DIR__ . "/../includes/header.php";
     border: 1px solid #c3e6cb;
 }
 
+.form-group-error input,
+.form-group-error select,
+.form-group-error textarea {
+    border-color: #dc3545 !important;
+    background: #fff5f5;
+}
+
+.form-group-error input:focus,
+.form-group-error select:focus,
+.form-group-error textarea:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+}
+
 @media (max-width: 1024px) {
     .product-form-wrapper {
         grid-template-columns: 1fr;
@@ -466,41 +502,50 @@ require_once __DIR__ . "/../includes/header.php";
                     </div>
 
                     <div class="form-grid-2col">
-                        <div class="form-group">
+                        <div class="form-group <?= isset($field_errors['name']) ? 'form-group-error' : '' ?>">
                             <label for="name">Product Name <span class="required">*</span></label>
-                            <input type="text" name="name" id="name" placeholder="e.g. Premium Sports T-Shirt" required>
+                            <input type="text" name="name" id="name" placeholder="e.g. Premium Sports T-Shirt" value="<?= htmlspecialchars($form_data['name'] ?? '') ?>" required>
+                            <?php if (isset($field_errors['name'])): ?>
+                                <small style="color: #dc3545; margin-top: 4px;">❌ <?= $field_errors['name'] ?></small>
+                            <?php endif; ?>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group <?= isset($field_errors['category_id']) ? 'form-group-error' : '' ?>">
                             <label for="category_id">Category <span class="required">*</span></label>
                             <select name="category_id" id="category_id" required>
                                 <option value="">-- Select Category --</option>
                                 <?php foreach ($cats as $cat): ?>
-                                    <option value="<?= $cat['id'] ?>"><?= sanitize($cat['name']) ?></option>
+                                    <option value="<?= $cat['id'] ?>" <?= ($form_data['category_id'] ?? 0) == $cat['id'] ? 'selected' : '' ?>><?= sanitize($cat['name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
+                            <?php if (isset($field_errors['category_id'])): ?>
+                                <small style="color: #dc3545; margin-top: 4px;">❌ <?= $field_errors['category_id'] ?></small>
+                            <?php endif; ?>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea name="description" id="description" placeholder="Enter detailed product description..."></textarea>
+                        <textarea name="description" id="description" placeholder="Enter detailed product description..."><?= htmlspecialchars($form_data['description'] ?? '') ?></textarea>
                     </div>
 
                     <div class="form-grid-2col">
                         <div class="form-group">
                             <label for="gender">Gender/Type</label>
                             <select name="gender" id="gender">
-                                <option value="Accessories">Accessories</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="unisex">Unisex</option>
+                                <option value="Accessories" <?= ($form_data['gender'] ?? 'Accessories') === 'Accessories' ? 'selected' : '' ?>>Accessories</option>
+                                <option value="male" <?= ($form_data['gender'] ?? '') === 'male' ? 'selected' : '' ?>>Male</option>
+                                <option value="female" <?= ($form_data['gender'] ?? '') === 'female' ? 'selected' : '' ?>>Female</option>
+                                <option value="unisex" <?= ($form_data['gender'] ?? '') === 'unisex' ? 'selected' : '' ?>>Unisex</option>
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group <?= isset($field_errors['price']) ? 'form-group-error' : '' ?>">
                             <label for="price">Base Price (QAR) <span class="required">*</span></label>
-                            <input type="number" step="0.01" name="price" id="price" placeholder="0.00" required>
+                            <input type="number" step="0.01" name="price" id="price" placeholder="0.00" value="<?= htmlspecialchars($form_data['price'] ?? '') ?>" required>
+                            <?php if (isset($field_errors['price'])): ?>
+                                <small style="color: #dc3545; margin-top: 4px;">❌ <?= $field_errors['price'] ?></small>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -514,7 +559,7 @@ require_once __DIR__ . "/../includes/header.php";
                     <div class="form-grid-full">
                         <div class="form-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="track_stock" id="track_stock" value="1" checked>
+                                <input type="checkbox" name="track_stock" id="track_stock" value="1" <?= ($form_data['track_stock'] ?? 1) ? 'checked' : '' ?>>
                                 <span>Track Stock Inventory</span>
                             </label>
                             <small class="form-hint">Enable inventory tracking for this product</small>
@@ -522,13 +567,13 @@ require_once __DIR__ . "/../includes/header.php";
 
                         <div class="form-group">
                             <label for="low_stock_threshold">Low Stock Threshold (units)</label>
-                            <input type="number" name="low_stock_threshold" id="low_stock_threshold" value="5" min="0" placeholder="5">
+                            <input type="number" name="low_stock_threshold" id="low_stock_threshold" value="<?= htmlspecialchars($form_data['low_stock_threshold'] ?? 5) ?>" min="0" placeholder="5">
                             <small class="form-hint">Alert when total stock falls below this number</small>
                         </div>
 
                         <div class="form-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="featured" id="featured" value="1">
+                                <input type="checkbox" name="featured" id="featured" value="1" <?= ($form_data['featured'] ?? 0) ? 'checked' : '' ?>>
                                 <span>Featured Product</span>
                             </label>
                             <small class="form-hint">Highlight this product on the homepage</small>
@@ -592,6 +637,9 @@ const uploadArea = document.getElementById('imageUploadArea');
 const fileInput = document.getElementById('product_images');
 const previewGrid = document.getElementById('imagePreviewGrid');
 
+// Variant data from POST (if there was a validation error)
+const existingVariants = <?= json_encode($form_data['variants'] ?? []) ?>;
+
 // Drag and drop functionality
 uploadArea.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -642,9 +690,15 @@ function removeImagePreview(index) {
     handleImagePreview();
 }
 
-function addVariantRow() {
+function addVariantRow(variantData = null) {
     const container = document.getElementById('variants-container');
     variantCount++;
+    
+    const sizeId = variantData?.size_id || '';
+    const colorId = variantData?.color_id || '';
+    const stock = variantData?.stock || 0;
+    const sku = variantData?.sku || '';
+    const price = variantData?.price || '';
     
     const rowHTML = `
         <div class="variant-row" id="variant-row-${variantCount}">
@@ -670,24 +724,34 @@ function addVariantRow() {
 
             <div class="form-group">
                 <label for="stock_${variantCount}">Stock Qty</label>
-                <input type="number" name="variants[${variantCount}][stock]" id="stock_${variantCount}" value="0" min="0" placeholder="0">
+                <input type="number" name="variants[${variantCount}][stock]" id="stock_${variantCount}" value="${stock}" min="0" placeholder="0">
             </div>
 
             <div class="form-group">
                 <label for="sku_${variantCount}">SKU</label>
-                <input type="text" name="variants[${variantCount}][sku]" id="sku_${variantCount}" placeholder="e.g. PROD-S-RED">
+                <input type="text" name="variants[${variantCount}][sku]" id="sku_${variantCount}" placeholder="e.g. PROD-S-RED" value="${sku}">
             </div>
 
             <div class="form-group">
                 <label for="vprice_${variantCount}">Price (QAR)</label>
-                <input type="number" step="0.01" name="variants[${variantCount}][price]" id="vprice_${variantCount}" placeholder="Leave empty">
+                <input type="number" step="0.01" name="variants[${variantCount}][price]" id="vprice_${variantCount}" placeholder="Leave empty" value="${price}">
             </div>
 
             <button type="button" class="remove-variant-btn" onclick="removeVariantRow(${variantCount})">Remove</button>
         </div>
     `;
     
-    container.innerHTML += rowHTML;
+    container.insertAdjacentHTML('beforeend', rowHTML);
+    
+    // Set selected values if variant data was provided
+    if (variantData) {
+        if (sizeId) {
+            document.getElementById(`size_${variantCount}`).value = sizeId;
+        }
+        if (colorId) {
+            document.getElementById(`color_${variantCount}`).value = colorId;
+        }
+    }
 }
 
 function removeVariantRow(id) {
@@ -697,10 +761,17 @@ function removeVariantRow(id) {
     }
 }
 
-// Add one empty variant row on page load
+// Add variant rows on page load
 window.addEventListener('load', function() {
     const container = document.getElementById('variants-container');
-    if (container.children.length === 0) {
+    
+    // If there are existing variants from POST (validation error), restore them
+    if (existingVariants && Object.keys(existingVariants).length > 0) {
+        Object.values(existingVariants).forEach(variant => {
+            addVariantRow(variant);
+        });
+    } else if (container.children.length === 0) {
+        // Otherwise add one empty variant row
         addVariantRow();
     }
 });

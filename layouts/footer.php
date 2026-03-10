@@ -170,7 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const buttons = document.querySelectorAll(".add-to-cart-btn");
   buttons.forEach(btn => {
     btn.addEventListener("click", function () {
-      alert("asdasdasd");
       const productDiv = this.closest(".product");
       const productId = productDiv.dataset.id;
       const quantity = productDiv.querySelector(".quantity").value;
@@ -188,16 +187,74 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(data => {
         console.log(data);
         if (data.success) {
-          alert("✅ Added to cart: " + data.item.name + " (" + data.item.quantity + ")");
-          // Optional: update mini cart counter
-          document.getElementById("cart-count").textContent = data.cart_count;
+          showCartMessage(this, "Added to cart: " + data.item.name, "success");
+          // Update desktop cart count
+          const cartCount = document.getElementById("cart-count");
+          if (cartCount) {
+            cartCount.textContent = data.cart_count;
+            cartCount.style.display = "flex";
+          }
+          // Update mobile cart count
+          const mobileCartCount = document.getElementById("mobile-cart-count");
+          if (mobileCartCount) {
+            mobileCartCount.textContent = data.cart_count;
+            mobileCartCount.style.display = "flex";
+          }
         } else {
-          alert("❌ Error: " + data.message);
+          showCartMessage(this, "❌ Error: " + data.message, "error");
         }
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error("Fetch Error:", err);
+        showCartMessage(this, "❌ Something went wrong while adding to cart.", "error");
+      });
     });
   });
+
+  // Function to show message below button
+  function showCartMessage(button, message, type) {
+    let messageEl = button.nextElementSibling;
+    
+    // Remove existing message if present
+    if (messageEl && messageEl.classList.contains("cart-message")) {
+      messageEl.remove();
+    }
+    
+    // Create new message element
+    messageEl = document.createElement("div");
+    messageEl.className = "cart-message " + type;
+    messageEl.textContent = message;
+    messageEl.style.cssText = `
+      margin-top: 10px;
+      padding: 10px 15px;
+      border-radius: 4px;
+      font-size: 14px;
+      text-align: center;
+      animation: slideDown 0.3s ease-out;
+    `;
+    
+    if (type === "success") {
+      messageEl.style.backgroundColor = "#d4edda";
+      messageEl.style.color = "#155724";
+      messageEl.style.border = "1px solid #c3e6cb";
+    } else if (type === "error") {
+      messageEl.style.backgroundColor = "#f8d7da";
+      messageEl.style.color = "#721c24";
+      messageEl.style.border = "1px solid #f5c6cb";
+    }
+    
+    button.parentElement.insertBefore(messageEl, button.nextSibling);
+    
+    // Auto-remove success message after 3 seconds
+    if (type === "success") {
+      setTimeout(() => {
+        if (messageEl.parentElement) {
+          messageEl.style.animation = "slideUp 0.3s ease-out";
+          setTimeout(() => messageEl.remove(), 300);
+        }
+      }, 3000);
+    }
+  }
 });
 //   const url = "assets/athletes/RUN OF THE MILL X ZAJEL PROPOSAL FINAL (2).pdf"; // replace with your PDF file path
 //   let pdfDoc = null,

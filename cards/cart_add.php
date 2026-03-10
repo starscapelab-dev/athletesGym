@@ -16,7 +16,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $userId = $_SESSION['user_id'] ?? null;
-$sessionId = session_id();
 
 try {
     $input = json_decode(file_get_contents("php://input"), true);
@@ -53,21 +52,8 @@ try {
         throw new Exception("Variant ID is required for this product.");
     }
 
-    // --- Ensure a cart record exists for this session ---
-    if ($userId) {
-        $stmt = $pdo->prepare("SELECT id FROM carts WHERE user_id=? and status = 'active' LIMIT 1");
-        $stmt->execute([$userId]);
-    } else {
-        $stmt = $pdo->prepare("SELECT id FROM carts WHERE session_id=? and status = 'active' LIMIT 1");
-        $stmt->execute([$sessionId]);
-    }
-    $cartId = $stmt->fetchColumn();
-
-    if (!$cartId) {
-        $stmt = $pdo->prepare("INSERT INTO carts (user_id, session_id, status, created_at) VALUES (?, ?, 'active', NOW())");
-        $stmt->execute([$userId, $sessionId]);
-        $cartId = $pdo->lastInsertId();
-    }
+    // --- Get cart ID using the same logic as getCartId() function ---
+    $cartId = getCartId($pdo);
 
     // --- Check if item already exists in the cart ---
     $stmt = $pdo->prepare("
@@ -77,6 +63,10 @@ try {
     ");
     $stmt->execute([$cartId, $productId, $variantId]);
     $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // --- Get current user ID for cart_items table ---
+    $currentUserId = $_SESSION['user_id'] ?? null;
+    $currentSessionId = session_id();
 
     $currentQty = $existing ? (int)$existing['quantity'] : 0;
     $newQty = $currentQty + $qty;
@@ -99,7 +89,7 @@ try {
             INSERT INTO cart_items (cart_id, user_id, product_id, variant_id, session_id, quantity, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
         ");
-        $stmt->execute([$cartId, $userId, $productId, $variantId, $sessionId, $qty]);
+        $stmt->execute([$cartId, $currentUserId, $productId, $variantId, $currentSessionId, $qty]);
     }
 
     // --- Count total items for cart indicator ---
