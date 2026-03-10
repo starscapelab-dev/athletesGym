@@ -16,14 +16,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category_id = (int)$_POST['category_id'];
     $gender = $_POST['gender'];
     $price = floatval($_POST['price']);
+    $track_stock = isset($_POST['track_stock']) ? 1 : 0;
+    $low_stock_threshold = (int)($_POST['low_stock_threshold'] ?? 5);
+    $featured = isset($_POST['featured']) ? 1 : 0;
 
     if ($name === '' || $price <= 0 || !$category_id) {
         $error = "All fields are required.";
     } else {
-        $stmt = $pdo->prepare("INSERT INTO products (name, description, category_id, gender, price) VALUES (?,?,?,?,?)");
-        $stmt->execute([$name, $description, $category_id, $gender, $price]);
-        ob_end_clean(); // clear any previous output
-        header("Location: " . BASE_URL . "admin/products/list.php");
+        try {
+            $stmt = $pdo->prepare("INSERT INTO products (name, description, category_id, gender, price, track_stock, low_stock_threshold, featured) VALUES (?,?,?,?,?,?,?,?)");
+            $stmt->execute([$name, $description, $category_id, $gender, $price, $track_stock, $low_stock_threshold, $featured]);
+            $product_id = $pdo->lastInsertId();
+            ob_end_clean(); // clear any previous output
+            header("Location: " . BASE_URL . "admin/products/edit.php?id=" . $product_id);
+        } catch (PDOException $e) {
+            $error = "Error adding product: " . $e->getMessage();
+        }
     }
 }
 
@@ -64,6 +72,25 @@ require_once __DIR__ . "/../includes/header.php";
   <div class="form-group">
   <label for="price">Price</label>
   <input type="number" step="0.01" name="price" id="price" required>
+  </div>
+  <div class="form-group">
+  <label for="track_stock">
+    <input type="checkbox" name="track_stock" id="track_stock" value="1" checked>
+    Track Stock
+  </label>
+  <small>Enable stock tracking for this product</small>
+  </div>
+  <div class="form-group">
+  <label for="low_stock_threshold">Low Stock Threshold</label>
+  <input type="number" name="low_stock_threshold" id="low_stock_threshold" value="5" min="0">
+  <small>Alert when stock falls below this number</small>
+  </div>
+  <div class="form-group">
+  <label for="featured">
+    <input type="checkbox" name="featured" id="featured" value="1">
+    Featured Product
+  </label>
+  <small>Highlight this product on the homepage</small>
   </div>
 
 <div class="form-actions">
