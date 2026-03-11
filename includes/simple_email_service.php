@@ -350,6 +350,17 @@ class SimpleEmailService {
     }
 
     /**
+     * Send OTP verification code
+     */
+    public function sendOTP($email, $otp, $userName = 'User') {
+        $subject = "Your Password Reset Code - Athletes Gym";
+
+        $message = $this->getOTPTemplate($otp, $userName);
+
+        return $this->send($email, $subject, $message);
+    }
+
+    /**
      * Send welcome email
      */
     public function sendWelcomeEmail($email, $userName) {
@@ -836,6 +847,64 @@ HTML;
     /**
      * Password reset template
      */
+    /**
+     * OTP verification code template
+     */
+    private function getOTPTemplate($otp, $userName) {
+        $styles = $this->getEmailStyles();
+        $header = $this->getEmailHeader('Verify Your Identity', 'OTP Verification');
+        $footer = $this->getEmailFooter();
+
+        return <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    {$styles}
+    <style>
+        .code-box {
+            background: #f9f9f9;
+            border: 3px solid #000000;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .code {
+            font-family: 'Courier New', monospace;
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #000000;
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        {$header}
+        <div class="email-content">
+            <p>Hello <strong>{$userName}</strong>,</p>
+            <p>We received a request to verify your identity. Please use the verification code below to proceed:</p>
+
+            <div class="code-box">
+                <div class="code">{$otp}</div>
+                <p style="margin: 0; color: #666666; font-size: 13px;">This code expires in 10 minutes</p>
+            </div>
+
+            <div class="alert-box">
+                <p style="margin: 0;"><strong>Security Notice:</strong> If you didn't request this verification, please ignore this email. For security concerns, contact us immediately.</p>
+            </div>
+
+            <p>For security assistance, please contact us at <a href="mailto:info@athletesgym.qa">info@athletesgym.qa</a></p>
+        </div>
+        {$footer}
+    </div>
+</body>
+</html>
+HTML;
+    }
+
     private function getPasswordResetTemplate($code, $userName) {
         $styles = $this->getEmailStyles();
         $header = $this->getEmailHeader('Password Reset Request', 'Security Verification');

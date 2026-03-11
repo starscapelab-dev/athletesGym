@@ -2,7 +2,7 @@
 require_once "../includes/csrf.php";
 require_once "../includes/session.php";
 require_once "../admin/includes/db.php";
-require_once "../includes/email_service.php";
+require_once "../includes/simple_email_service.php";
 
 // SECURITY: Validate CSRF token
 requireCsrfToken();
@@ -34,9 +34,9 @@ $expiresAt = date("Y-m-d H:i:s", strtotime("+10 minutes"));
 $stmt = $pdo->prepare("UPDATE users SET reset_otp=?, reset_expires=? WHERE email=?");
 $stmt->execute([$otp, $expiresAt, $email]);
 
-// Send OTP email using Resend
+// Send OTP email using SimpleEmailService
 try {
-    $emailService = new EmailService();
+    $emailService = new SimpleEmailService();
     $emailService->sendOTP($email, $otp, $user['name'] ?? 'User');
 } catch (Exception $e) {
     error_log("Failed to send OTP email: " . $e->getMessage());

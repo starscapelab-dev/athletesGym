@@ -1,7 +1,7 @@
 <?php
 require_once "includes/session.php";
 require_once "admin/includes/db.php";
-require_once "includes/email_service.php";
+require_once "includes/simple_email_service.php";
 require_once "includes/csrf.php";
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -42,7 +42,7 @@ try {
 
 // Send email notification
 try {
-    $emailService = new EmailService();
+    $emailService = new SimpleEmailService();
     $emailService->sendContactForm([
         'name' => $name,
         'email' => $email,
