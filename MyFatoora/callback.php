@@ -81,6 +81,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         try {
             $orderId = $data['CustomerReference'];
 
+            error_log("=== 📧 ORDER EMAIL PROCESS STARTED ===");
+            error_log("Order ID: {$orderId}");
+            error_log("APP_ENV: " . env('APP_ENV'));
+            error_log("MAIL_FROM: " . env('MAIL_FROM_ADDRESS'));
+            error_log("=== ===");
+
             // Fetch order details
             $orderStmt = $pdo->prepare("SELECT * FROM orders WHERE id = ?");
             $orderStmt->execute([$orderId]);
@@ -92,8 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $items = $itemsStmt->fetchAll();
 
             if ($order && $order['email']) {
+                error_log("Sending email to: {$order['email']}");
+                
                 $emailService = new SimpleEmailService();
-                $emailService->sendOrderConfirmation([
+                
+                $customerEmailSent = $emailService->sendOrderConfirmation([
                     'order_id' => $orderId,
                     'customer_name' => $order['full_name'],
                     'customer_email' => $order['email'],
@@ -112,8 +121,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     }, $items)
                 ]);
                 
+                if ($customerEmailSent) {
+                    error_log("✅ Customer email sent successfully to: {$order['email']}");
+                } else {
+                    error_log("❌ Customer email FAILED to send to: {$order['email']}");
+                }
+                
                 // Also notify admin
-                $emailService->sendOrderNotificationToAdmin([
+                $adminEmailSent = $emailService->sendOrderNotificationToAdmin([
                     'order_id' => $orderId,
                     'customer_name' => $order['full_name'],
                     'customer_email' => $order['email'],
@@ -129,11 +144,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         ];
                     }, $items)
                 ]);
+                
+                if ($adminEmailSent) {
+                    error_log("✅ Admin email sent successfully");
+                } else {
+                    error_log("❌ Admin email FAILED to send");
+                }
+            } else {
+                error_log("❌ Order not found or missing email - Order: " . print_r($order, true));
             }
         } catch (Exception $e) {
-            error_log("Failed to send order confirmation email: " . $e->getMessage());
+            error_log("❌ EXCEPTION during order email: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
             // Don't fail the payment process if email fails
         }
+
 
         // Clear cart after successful payment
         require_once __DIR__ . "/../includes/cart_functions.php";

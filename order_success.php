@@ -1,10 +1,18 @@
 <?php
-require_once __DIR__ . "/layouts/header-item.php";
-require_once __DIR__ . "/admin/includes/db.php";
-require_once __DIR__ . "/includes/cart_functions.php";
+// Load config and session WITHOUT requiring database (to prevent page failure)
+require_once __DIR__ . "/includes/session.php";
 require_once __DIR__ . "/layouts/config.php";
 
-// Session already started by header-item.php
+// Try to load database, but handle gracefully if it fails
+$pdo = null;
+try {
+    require_once __DIR__ . "/admin/includes/db.php";
+} catch (Exception $e) {
+    error_log("Order success page: Database connection failed - " . $e->getMessage());
+    // Continue without database - the page can still show order info
+}
+
+// Session already started by session.php
 
 // Check if preview mode is enabled (localhost only)
 $isPreview = isset($_GET['preview']) && $_GET['preview'] == '1' && 
@@ -56,7 +64,12 @@ if ($isPreview) {
 
     if ($orderId <= 0) {
         echo "<div class='container'><h2>Invalid Order Reference</h2></div>";
-        require_once __DIR__ . "/layouts/footer.php";
+        exit;
+    }
+
+    // Check if database connection is available
+    if ($pdo === null) {
+        echo "<div class='container'><h2>Service Unavailable</h2><p>We're experiencing technical difficulties. Please try again later or contact support.</p></div>";
         exit;
     }
 
@@ -101,8 +114,41 @@ if ($isPreview) {
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - Athletes Gym</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #000;">
+    <div class="container">
+        <a class="navbar-brand" href="index.php"><img src="assets/images/logo/logo-white.png" width="180px" alt="Athletes Gym"></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="index.php">HOME</a></li>
+                <li class="nav-item"><a class="nav-link" href="about-us.php">ABOUT</a></li>
+                <li class="nav-item"><a class="nav-link" href="shop.php">SHOP</a></li>
+                <li class="nav-item"><a class="nav-link" href="contact.php">CONTACT</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
 <style>
+
   * {
     margin: 0;
     padding: 0;
@@ -620,4 +666,14 @@ if ($isPreview) {
   </div>
 </div>
 
-<?php require_once "layouts/footer.php"; ?>
+<!-- Footer -->
+<footer style="background: #000; color: #fff; padding: 40px 20px; text-align: center; margin-top: 80px;">
+    <div class="container">
+        <h3 style="margin-bottom: 20px;"><a href="https://www.instagram.com/athletesqa/" target="_blank" style="color: #fff; text-decoration: none;">Follow US @Athletesqa</a></h3>
+        <p>&copy; 2024 Athletes Gym Qatar. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

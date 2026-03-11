@@ -231,17 +231,37 @@ function getStatusContent($status, $orderId) {
  * Send email using PHP mail function
  */
 function sendEmail($to, $subject, $htmlBody, $toName = '') {
+    // Load environment variables if not already loaded
+    if (!function_exists('env')) {
+        require_once __DIR__ . '/../../includes/env_loader.php';
+    }
+
+    // Get email configuration from environment variables
+    $fromEmail = env('MAIL_FROM_ADDRESS', 'noreply@athletesgym.qa');
+    $fromName = env('MAIL_FROM_NAME', 'Athletes Gym Qatar');
+    $replyToEmail = env('MAIL_ADMIN_ADDRESS', 'athletesgymqa@gmail.com');
+
     $headers = [
         'MIME-Version: 1.0',
         'Content-Type: text/html; charset=UTF-8',
-        'From: Athletes Gym <noreply@athletesgym.com>',
-        'Reply-To: support@athletesgym.com',
-        'X-Mailer: PHP/' . phpversion()
+        "From: {$fromName} <{$fromEmail}>",
+        "Reply-To: {$replyToEmail}",
+        'X-Mailer: PHP/' . phpversion(),
+        'Return-Path: ' . $fromEmail
     ];
 
     // Add recipient name if provided
     $recipient = $toName ? "$toName <$to>" : $to;
 
-    // Send email
-    return mail($recipient, $subject, $htmlBody, implode("\r\n", $headers));
+    // Send email with error logging
+    $success = mail($recipient, $subject, $htmlBody, implode("\r\n", $headers));
+
+    // Log email sending for debugging
+    if (!$success) {
+        error_log("Failed to send email to: {$to} | Subject: {$subject} | From: {$fromEmail}");
+    } else {
+        error_log("Email sent successfully to: {$to} | Subject: {$subject}");
+    }
+
+    return $success;
 }

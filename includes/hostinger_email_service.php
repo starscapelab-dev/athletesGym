@@ -59,6 +59,9 @@ class HostingerEmailService {
         // From header
         $headers[] = "From: {$this->fromName} <{$this->fromEmail}>";
 
+        // Return-Path header (important for deliverability)
+        $headers[] = "Return-Path: <{$this->fromEmail}>";
+
         // Reply-To header
         $replyTo = $options['replyTo'] ?? $this->replyToEmail;
         $headers[] = "Reply-To: {$replyTo}";

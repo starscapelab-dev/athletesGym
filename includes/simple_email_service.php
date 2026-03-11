@@ -243,12 +243,21 @@ class SimpleEmailService {
         // Build headers
         $headerString = $this->buildHeaders($headers);
 
+        error_log("=== 📧 SENDING EMAIL ===");
+        error_log("To: {$to}");
+        error_log("Subject: {$subject}");
+        error_log("From: {$this->fromEmail}");
+        error_log("Environment: " . env('APP_ENV'));
+        
         // Send email
         $success = @mail($to, $subject, $message, $headerString);
 
         if (!$success) {
-            error_log("Failed to send email to: {$to} - Subject: {$subject}");
+            error_log("❌ MAIL FUNCTION FAILED - To: {$to}, Subject: {$subject}, From: {$this->fromEmail}");
+        } else {
+            error_log("✅ MAIL FUNCTION SUCCESS - To: {$to}");
         }
+        error_log("=== === ===");
 
         return $success;
     }
@@ -261,6 +270,9 @@ class SimpleEmailService {
 
         // From header
         $headers[] = "From: {$this->fromName} <{$this->fromEmail}>";
+
+        // Return-Path header (important for deliverability)
+        $headers[] = "Return-Path: <{$this->fromEmail}>";
 
         // Reply-To
         if (isset($customHeaders['Reply-To'])) {
@@ -275,6 +287,10 @@ class SimpleEmailService {
         // Content type
         $headers[] = "Content-Type: text/html; charset=UTF-8";
         $headers[] = "MIME-Version: 1.0";
+        
+        // Additional headers for better deliverability
+        $headers[] = "X-Mailer: PHP/" . phpversion();
+        $headers[] = "X-Priority: 3";
 
         return implode("\r\n", $headers);
     }
@@ -316,10 +332,22 @@ class SimpleEmailService {
      */
     public function sendOrderConfirmation($orderData) {
         $subject = "Order Confirmation #{$orderData['order_id']} - Athletes Gym";
+        $to = $orderData['customer_email'];
 
-        $message = $this->getOrderTemplate($orderData);
+        error_log("📧 Preparing order confirmation email to: {$to}");
+        
+        try {
+            $message = $this->getOrderTemplate($orderData);
+            error_log("📧 Order template generated, message length: " . strlen($message));
+        } catch (Exception $e) {
+            error_log("❌ Error generating order template: " . $e->getMessage());
+            return false;
+        }
 
-        return $this->send($orderData['customer_email'], $subject, $message);
+        $result = $this->send($to, $subject, $message);
+        error_log("📧 Order confirmation send result: " . ($result ? "SUCCESS" : "FAILED"));
+        
+        return $result;
     }
 
     /**

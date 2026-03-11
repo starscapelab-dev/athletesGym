@@ -7,6 +7,8 @@ require_once __DIR__ . "/../includes/db.php";
 require_once __DIR__ . "/../includes/functions.php";
 require_once __DIR__ . "/../includes/header.php";
 
+session_start();
+
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $stmt = $pdo->prepare("SELECT * FROM orders WHERE id=?");
 $stmt->execute([$id]);
@@ -28,6 +30,21 @@ $stmt = $pdo->prepare("
 $stmt->execute([$id]);
 $items = $stmt->fetchAll();
 ?>
+
+<!-- Success/Error Messages -->
+<?php if (isset($_SESSION['success_msg'])): ?>
+<div class="admin-alert admin-alert-success" style="margin-bottom: 20px;">
+  <?= htmlspecialchars($_SESSION['success_msg']) ?>
+  <?php unset($_SESSION['success_msg']); ?>
+</div>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['error_msg'])): ?>
+<div class="admin-alert admin-alert-error" style="margin-bottom: 20px;">
+  <?= htmlspecialchars($_SESSION['error_msg']) ?>
+  <?php unset($_SESSION['error_msg']); ?>
+</div>
+<?php endif; ?>
 
 <div class="admin-page-header">
   <h1>Order #<?= $order['id'] ?></h1>
@@ -96,11 +113,23 @@ $items = $stmt->fetchAll();
       </div>
       <button type="submit" class="btn btn-primary">Update</button>
     </form>
+
+    <!-- Resend Email Section -->
+    <div style="margin-top: 20px; padding: 20px; background: #f0f4ff; border-radius: 8px; border-left: 4px solid #4CAF50;">
+      <h3 style="margin: 0 0 15px 0; color: #333; font-size: 14px;">📧 Resend Emails</h3>
+      <p style="margin: 0 0 15px 0; color: #666; font-size: 13px;">Click the button below to resend order confirmation emails to both the customer and admin.</p>
+      <form method="post" action="resend_email.php" style="display: inline;">
+        <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+        <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to resend order emails?')">
+          <span style="margin-right: 5px;">📧</span> Resend Order Emails
+        </button>
+      </form>
+    </div>
   </div>
 </div>
 
-<h2 class="admin-section-title" style="margin-top: 40px;">Items</h2>
-  <table class="admin-table">
+<h2 class="admin-section-title" style="margin-top: 40px;">Order Items</h2>
+<table class="admin-table">
     <thead>
       <tr>
         <th>Image</th>
@@ -130,7 +159,6 @@ $items = $stmt->fetchAll();
       <?php endforeach; ?>
     </tbody>
   </table>
-</div>
 
 <style>
 .order-details-grid {
@@ -180,6 +208,43 @@ $items = $stmt->fetchAll();
   .order-details-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.admin-alert {
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-alert-success {
+  background: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.admin-alert-error {
+  background: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #f5365c;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 </style>
 
