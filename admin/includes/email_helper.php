@@ -22,15 +22,31 @@ function sendOrderStatusEmail($pdo, $orderId, $newStatus) {
         return false;
     }
 
-    // Get order items
+    // Get order items with product images
     $itemsStmt = $pdo->prepare("
-        SELECT oi.*, p.name as product_name
+        SELECT oi.*, p.name as product_name, pi.image_path
         FROM order_items oi
         JOIN products p ON oi.product_id = p.id
+        LEFT JOIN product_images pi ON oi.product_id = pi.product_id
         WHERE oi.order_id = ?
+        ORDER BY oi.id, pi.id
     ");
     $itemsStmt->execute([$orderId]);
-    $items = $itemsStmt->fetchAll();
+    $allItems = $itemsStmt->fetchAll();
+    
+    // Group images by order_item_id
+    $items = [];
+    foreach ($allItems as $item) {
+        $key = $item['id'];
+        if (!isset($items[$key])) {
+            $items[$key] = $item;
+            $items[$key]['images'] = [];
+        }
+        if ($item['image_path']) {
+            $items[$key]['images'][] = $item['image_path'];
+        }
+    }
+    $items = array_values($items);
 
     // Prepare email based on status
     $subject = getEmailSubject($newStatus, $orderId);
@@ -48,7 +64,8 @@ function getEmailSubject($status, $orderId) {
         'pending' => "Order #$orderId Received - Athletes Gym",
         'processing' => "Order #$orderId is Being Processed - Athletes Gym",
         'shipped' => "Order #$orderId Has Been Shipped - Athletes Gym",
-        'completed' => "Order #$orderId Delivered - Athletes Gym",
+        'delivered' => "Order #$orderId Delivered - Athletes Gym",
+        'refunded' => "Order #$orderId Refunded - Athletes Gym",
         'cancelled' => "Order #$orderId Cancelled - Athletes Gym"
     ];
 
@@ -59,23 +76,42 @@ function getEmailSubject($status, $orderId) {
  * Generate HTML email template
  */
 function getEmailTemplate($order, $items, $status) {
+    // Load env if needed
+    if (!function_exists('env')) {
+        require_once __DIR__ . '/../../includes/env_loader.php';
+    }
+    
     $orderId = $order['id'];
     $customerName = $order['customer_name'] ?? $order['full_name'];
     $orderDate = date('M d, Y', strtotime($order['created_at']));
     $total = number_format($order['total'], 2);
+    $siteUrl = env('APP_URL', 'https://athletesgym.qa');
 
     // Status-specific content
     $statusContent = getStatusContent($status, $orderId);
 
-    // Build items HTML
+    // Build items HTML with images
     $itemsHtml = '';
     foreach ($items as $item) {
         $itemTotal = number_format($item['price'] * $item['quantity'], 2);
+        $imageHtml = '';
+        
+        // Add first product image if available
+        if (!empty($item['images']) && isset($item['images'][0])) {
+            $imagePath = $item['images'][0];
+            // Build image URL
+            $imageUrl = $siteUrl . '/admin/product_images/' . $imagePath;
+            $imageHtml = "<img src='{$imageUrl}' alt='{$item['product_name']}' style='max-width: 120px; max-height: 120px; border-radius: 4px; margin-right: 15px; vertical-align: top;' />";
+        }
+        
         $itemsHtml .= "
         <tr>
-            <td style='padding: 15px; border-bottom: 1px solid #e5e5e5;'>
-                <strong style='color: #000; font-size: 15px;'>{$item['product_name']}</strong><br>
-                <span style='color: #666; font-size: 13px;'>Quantity: {$item['quantity']}</span>
+            <td style='padding: 15px; border-bottom: 1px solid #e5e5e5; vertical-align: top;'>
+                {$imageHtml}
+                <div style='display: inline-block; vertical-align: top;'>
+                    <strong style='color: #000; font-size: 15px;'>{$item['product_name']}</strong><br>
+                    <span style='color: #666; font-size: 13px;'>Quantity: {$item['quantity']}</span>
+                </div>
             </td>
             <td style='padding: 15px; border-bottom: 1px solid #e5e5e5; text-align: right; color: #000; font-weight: 600;'>
                 {$itemTotal} QAR
@@ -181,9 +217,6 @@ function getEmailTemplate($order, $items, $status) {
     ";
 }
 
-/**
- * Get status-specific content
- */
 function getStatusContent($status, $orderId) {
     $content = [
         'pending' => [
@@ -205,12 +238,21 @@ function getStatusContent($status, $orderId) {
                 </p>
             </div>'
         ],
-        'completed' => [
+        'delivered' => [
             'title' => 'Order Delivered Successfully',
             'message' => 'Your order has been delivered! We hope you enjoy your purchase. Thank you for choosing Athletes Gym.',
             'action' => '<div style="margin-top: 30px; text-align: center;">
                 <p style="margin: 0 0 15px 0; color: #333; font-size: 14px;">How was your experience?</p>
                 <p style="margin: 0; color: #666; font-size: 13px;">We would love to hear your feedback about your purchase.</p>
+            </div>'
+        ],
+        'refunded' => [
+            'title' => 'Refund Processed',
+            'message' => 'Your refund has been processed successfully. The funds should appear in your account within 5-7 business days.',
+            'action' => '<div style="margin-top: 30px; padding: 20px; background-color: #f0fff0; border-left: 4px solid #28a745; border-radius: 4px;">
+                <p style="margin: 0; color: #333; font-size: 14px;">
+                    <strong>Refund Status:</strong> Complete
+                </p>
             </div>'
         ],
         'cancelled' => [

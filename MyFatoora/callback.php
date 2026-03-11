@@ -92,10 +92,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $orderStmt->execute([$orderId]);
             $order = $orderStmt->fetch();
 
-            // Fetch order items
-            $itemsStmt = $pdo->prepare("SELECT product_name, quantity, price FROM order_items WHERE order_id = ?");
+            // Fetch order items with images
+            $itemsStmt = $pdo->prepare("
+                SELECT 
+                    oi.product_name, 
+                    oi.quantity, 
+                    oi.price,
+                    GROUP_CONCAT(pi.image_path) as images
+                FROM order_items oi
+                LEFT JOIN product_images pi ON oi.product_id = pi.product_id
+                WHERE oi.order_id = ?
+                GROUP BY oi.id
+            ");
             $itemsStmt->execute([$orderId]);
-            $items = $itemsStmt->fetchAll();
+            $itemsResult = $itemsStmt->fetchAll();
+            
+            // Transform items to include images
+            $items = array_map(function($item) {
+                return [
+                    'product_name' => $item['product_name'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'images' => $item['images'] ? explode(',', $item['images']) : []
+                ];
+            }, $itemsResult);
 
             if ($order && $order['email']) {
                 error_log("Sending email to: {$order['email']}");
@@ -116,7 +136,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         return [
                             'name' => $item['product_name'],
                             'quantity' => $item['quantity'],
-                            'price' => $item['price']
+                            'price' => $item['price'],
+                            'images' => $item['images'] ?? []
                         ];
                     }, $items)
                 ]);
@@ -140,7 +161,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         return [
                             'name' => $item['product_name'],
                             'quantity' => $item['quantity'],
-                            'price' => $item['price']
+                            'price' => $item['price'],
+                            'images' => $item['images'] ?? []
                         ];
                     }, $items)
                 ]);

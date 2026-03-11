@@ -565,11 +565,28 @@ HTML;
             $itemPrice = number_format(floatval($item['price']), 2);
             $itemTotal = number_format(floatval($item['price']) * $itemQty, 2);
 
+            $imageHtml = '';
+            // Add first product image if available
+            if (isset($item['images']) && is_array($item['images']) && !empty($item['images'])) {
+                $imagePath = $item['images'][0];
+                $imageUrl = htmlspecialchars($this->siteUrl . '/admin/product_images/' . $imagePath);
+                $imageHtml = "<img src='{$imageUrl}' alt='{$itemName}' style='max-width: 100px; max-height: 100px; border-radius: 4px; margin-right: 15px; display: inline-block; vertical-align: top;' />";
+            } elseif (isset($item['image']) && !empty($item['image'])) {
+                // Fallback to single image field if provided
+                $imageUrl = htmlspecialchars($this->siteUrl . '/admin/product_images/' . $item['image']);
+                $imageHtml = "<img src='{$imageUrl}' alt='{$itemName}' style='max-width: 100px; max-height: 100px; border-radius: 4px; margin-right: 15px; display: inline-block; vertical-align: top;' />";
+            }
+
             $itemsHtml .= "<tr>
-                <td>{$itemName}{$itemSKU}{$itemSize}{$itemColor}</td>
-                <td style='text-align: center;'>{$itemQty}</td>
-                <td style='text-align: right;'>{$itemPrice} QR</td>
-                <td style='text-align: right;'>{$itemTotal} QR</td>
+                <td style='padding: 10px; vertical-align: top;'>
+                    {$imageHtml}
+                    <div style='display: inline-block; vertical-align: top;'>
+                        {$itemName}{$itemSKU}{$itemSize}{$itemColor}
+                    </div>
+                </td>
+                <td style='text-align: center; padding: 10px;'>{$itemQty}</td>
+                <td style='text-align: right; padding: 10px;'>{$itemPrice} QR</td>
+                <td style='text-align: right; padding: 10px;'>{$itemTotal} QR</td>
             </tr>";
         }
 
@@ -716,11 +733,28 @@ HTML;
             $itemPrice = number_format(floatval($item['price']), 2);
             $itemTotal = number_format(floatval($item['price']) * $itemQty, 2);
 
+            $imageHtml = '';
+            // Add first product image if available
+            if (isset($item['images']) && is_array($item['images']) && !empty($item['images'])) {
+                $imagePath = $item['images'][0];
+                $imageUrl = htmlspecialchars($this->siteUrl . '/admin/product_images/' . $imagePath);
+                $imageHtml = "<img src='{$imageUrl}' alt='{$itemName}' style='max-width: 100px; max-height: 100px; border-radius: 4px; margin-right: 15px; display: inline-block; vertical-align: top;' />";
+            } elseif (isset($item['image']) && !empty($item['image'])) {
+                // Fallback to single image field if provided
+                $imageUrl = htmlspecialchars($this->siteUrl . '/admin/product_images/' . $item['image']);
+                $imageHtml = "<img src='{$imageUrl}' alt='{$itemName}' style='max-width: 100px; max-height: 100px; border-radius: 4px; margin-right: 15px; display: inline-block; vertical-align: top;' />";
+            }
+
             $itemsHtml .= "<tr>
-                <td>{$itemName}{$itemSKU}{$itemSize}{$itemColor}{$itemCategory}</td>
-                <td style='text-align: center;'>{$itemQty}</td>
-                <td style='text-align: right;'>{$itemPrice} QR</td>
-                <td style='text-align: right;'>{$itemTotal} QR</td>
+                <td style='padding: 10px; vertical-align: top;'>
+                    {$imageHtml}
+                    <div style='display: inline-block; vertical-align: top;'>
+                        {$itemName}{$itemSKU}{$itemSize}{$itemColor}{$itemCategory}
+                    </div>
+                </td>
+                <td style='text-align: center; padding: 10px;'>{$itemQty}</td>
+                <td style='text-align: right; padding: 10px;'>{$itemPrice} QR</td>
+                <td style='text-align: right; padding: 10px;'>{$itemTotal} QR</td>
             </tr>";
         }
 
