@@ -7,7 +7,7 @@ session_start();
 require_once 'config.php';
 require_once __DIR__ . "/../admin/includes/db.php";
 require_once __DIR__ . "/../layouts/config.php";
-require_once __DIR__ . "/../includes/email_service.php";
+require_once __DIR__ . "/../includes/simple_email_service.php";
 
 // // require_once 'MyFatoorahLibrary2.php';
 // /* For simplicity check our PHP SDK library here https://myfatoorah.readme.io/php-library */
@@ -92,16 +92,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $items = $itemsStmt->fetchAll();
 
             if ($order && $order['email']) {
-                $emailService = new EmailService();
-                $emailService->sendOrderConfirmation($order['email'], [
+                $emailService = new SimpleEmailService();
+                $emailService->sendOrderConfirmation([
                     'order_id' => $orderId,
                     'customer_name' => $order['full_name'],
-                    'total' => number_format($order['total'], 2),
+                    'customer_email' => $order['email'],
+                    'customer_phone' => $order['phone'] ?? '',
+                    'shipping_address' => $order['address'] ?? '',
+                    'order_date' => $order['created_at'],
+                    'payment_method' => 'MyFatoorah',
+                    'order_status' => 'Processing',
+                    'total' => $order['total'],
                     'items' => array_map(function($item) {
                         return [
                             'name' => $item['product_name'],
                             'quantity' => $item['quantity'],
-                            'price' => number_format($item['price'], 2)
+                            'price' => $item['price']
+                        ];
+                    }, $items)
+                ]);
+                
+                // Also notify admin
+                $emailService->sendOrderNotificationToAdmin([
+                    'order_id' => $orderId,
+                    'customer_name' => $order['full_name'],
+                    'customer_email' => $order['email'],
+                    'customer_phone' => $order['phone'] ?? '',
+                    'shipping_address' => $order['address'] ?? '',
+                    'order_date' => $order['created_at'],
+                    'total' => $order['total'],
+                    'items' => array_map(function($item) {
+                        return [
+                            'name' => $item['product_name'],
+                            'quantity' => $item['quantity'],
+                            'price' => $item['price']
                         ];
                     }, $items)
                 ]);
