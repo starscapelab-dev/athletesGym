@@ -569,11 +569,12 @@ HTML;
             // Add first product image if available
             if (isset($item['images']) && is_array($item['images']) && !empty($item['images'])) {
                 $imagePath = $item['images'][0];
-                $imageUrl = htmlspecialchars($this->siteUrl . '/admin/product_images/' . $imagePath);
+                // Images are stored in /uploads/ directory
+                $imageUrl = htmlspecialchars($this->siteUrl . '/uploads/' . $imagePath);
                 $imageHtml = "<img src='{$imageUrl}' alt='{$itemName}' style='max-width: 100px; max-height: 100px; border-radius: 4px; margin-right: 15px; display: inline-block; vertical-align: top;' />";
             } elseif (isset($item['image']) && !empty($item['image'])) {
                 // Fallback to single image field if provided
-                $imageUrl = htmlspecialchars($this->siteUrl . '/admin/product_images/' . $item['image']);
+                $imageUrl = htmlspecialchars($this->siteUrl . '/uploads/' . $item['image']);
                 $imageHtml = "<img src='{$imageUrl}' alt='{$itemName}' style='max-width: 100px; max-height: 100px; border-radius: 4px; margin-right: 15px; display: inline-block; vertical-align: top;' />";
             }
 
@@ -737,11 +738,12 @@ HTML;
             // Add first product image if available
             if (isset($item['images']) && is_array($item['images']) && !empty($item['images'])) {
                 $imagePath = $item['images'][0];
-                $imageUrl = htmlspecialchars($this->siteUrl . '/admin/product_images/' . $imagePath);
+                // Images are stored in /uploads/ directory
+                $imageUrl = htmlspecialchars($this->siteUrl . '/uploads/' . $imagePath);
                 $imageHtml = "<img src='{$imageUrl}' alt='{$itemName}' style='max-width: 100px; max-height: 100px; border-radius: 4px; margin-right: 15px; display: inline-block; vertical-align: top;' />";
             } elseif (isset($item['image']) && !empty($item['image'])) {
                 // Fallback to single image field if provided
-                $imageUrl = htmlspecialchars($this->siteUrl . '/admin/product_images/' . $item['image']);
+                $imageUrl = htmlspecialchars($this->siteUrl . '/uploads/' . $item['image']);
                 $imageHtml = "<img src='{$imageUrl}' alt='{$itemName}' style='max-width: 100px; max-height: 100px; border-radius: 4px; margin-right: 15px; display: inline-block; vertical-align: top;' />";
             }
 

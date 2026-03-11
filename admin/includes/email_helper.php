@@ -99,8 +99,8 @@ function getEmailTemplate($order, $items, $status) {
         // Add first product image if available
         if (!empty($item['images']) && isset($item['images'][0])) {
             $imagePath = $item['images'][0];
-            // Build image URL
-            $imageUrl = $siteUrl . '/admin/product_images/' . $imagePath;
+            // Build image URL - images are stored in /uploads/ directory
+            $imageUrl = $siteUrl . '/uploads/' . $imagePath;
             $imageHtml = "<img src='{$imageUrl}' alt='{$item['product_name']}' style='max-width: 120px; max-height: 120px; border-radius: 4px; margin-right: 15px; vertical-align: top;' />";
         }
         
@@ -241,9 +241,10 @@ function getStatusContent($status, $orderId) {
         'delivered' => [
             'title' => 'Order Delivered Successfully',
             'message' => 'Your order has been delivered! We hope you enjoy your purchase. Thank you for choosing Athletes Gym.',
-            'action' => '<div style="margin-top: 30px; text-align: center;">
-                <p style="margin: 0 0 15px 0; color: #333; font-size: 14px;">How was your experience?</p>
-                <p style="margin: 0; color: #666; font-size: 13px;">We would love to hear your feedback about your purchase.</p>
+            'action' => '<div style="margin-top: 30px; padding: 20px; background-color: #f0fff0; border-left: 4px solid #28a745; border-radius: 4px; text-align: center;">
+                <p style="margin: 0 0 15px 0; color: #333; font-size: 14px;"><strong>Share Your Feedback!</strong></p>
+                <p style="margin: 0 0 15px 0; color: #666; font-size: 13px;">We would love to hear your feedback about your purchase. Please rate and review the products:</p>
+                <a href="' . $siteUrl . '/account/orders.php?order=' . $orderId . '#reviews" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">Rate Products</a>
             </div>'
         ],
         'refunded' => [
