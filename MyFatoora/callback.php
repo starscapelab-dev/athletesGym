@@ -174,12 +174,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $_SESSION['checkout_success']=  "Payment failed or pending. Status: " . $data['InvoiceStatus'];
        ob_end_clean(); // clear any buffered output
 
-        header("Location: " . BASE_URL . "/../order_success.php?id={$data['CustomerReference']}");
+        header("Location: " . BASE_URL . "order_success.php?id={$data['CustomerReference']}");
     }
 } else {
     $_SESSION['checkout_success']=  "Payment failed or pending. Status: " . $data['InvoiceStatus'];
        ob_end_clean(); // clear any buffered output
 
-        header("Location: " . BASE_URL . "/../order_success.php?id={$data['CustomerReference']}");
+        header("Location: " . BASE_URL . "order_success.php?id={$data['CustomerReference']}");
 }
 ?>

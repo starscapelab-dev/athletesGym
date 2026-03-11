@@ -183,10 +183,11 @@ require_once __DIR__ . '/MyFatoora/MyfatoorahLibrary2.php';
 try {
     $paymentMethodId = 0; //to be redirect to MyFatoorah invoice page
 
-    // Determine callback URL based on environment
-    $baseCallbackUrl = env('APP_ENV') === 'production'
-        ? 'https://athletesgym.qa'
-        : 'http://localhost/athletesGym';
+    // Determine callback URL based on current domain (dynamic for any environment)
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' 
+        || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+    $domain = $_SERVER['HTTP_HOST'];
+    $baseCallbackUrl = $protocol . $domain;
 
     // Format phone for MyFatoorah - must include country code 974
     $formattedPhone = preg_replace('/[^0-9]/', '', $phone); // Remove non-numeric
