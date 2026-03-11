@@ -7,7 +7,7 @@ require_once __DIR__ . "/../includes/db.php";
 require_once __DIR__ . "/../includes/functions.php";
 require_once __DIR__ . "/../includes/header.php";
 
-session_start();
+// Session already active from header/session includes - no need to start again
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $stmt = $pdo->prepare("SELECT * FROM orders WHERE id=?");

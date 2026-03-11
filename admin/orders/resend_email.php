@@ -12,7 +12,10 @@ require_once __DIR__ . "/../includes/db.php";
 require_once __DIR__ . '/../../layouts/config.php';
 require_once __DIR__ . '/../../includes/simple_email_service.php';
 
-session_start();
+// Session will be started by parent, but check and start if not already active
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $orderId = (int)($_POST['order_id'] ?? 0);
