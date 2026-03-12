@@ -13,13 +13,13 @@ $city = trim($_POST['city'] ?? '');
 $address = trim($_POST['address'] ?? '');
 
 if (!$name || !$phone || !$gender || !$country || !$city || !$address) {
-    header("Location: profile.php?msg=" . urlencode("All fields required."));
+    header("Location: profile.php?page=profile&msg=" . urlencode("All fields required."));
     exit;
 }
 
 $stmt = $pdo->prepare("UPDATE users SET name=?, phone=?, gender=?, dob=?, country=?, city=?, address=? WHERE id=?");
 $stmt->execute([$name, $phone, $gender, $dob, $country, $city, $address, $id]);
 
-header("Location: profile.php?msg=" . urlencode("Profile updated successfully!"));
+header("Location: profile.php?page=profile&msg=" . urlencode("Profile updated successfully!"));
 exit;
 ?>

@@ -185,10 +185,7 @@ require_auth();
             </li>
             <li class="nav-item">
             <?php if (!empty($_SESSION['user_id'])): ?>
-                <a class="nav-link user-profile-link" href="<?= BASE_URL ?>account/profile.php">
-                    <i class="fas fa-user-circle"></i>
-                    <span class="username-display"><?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?></span>
-                </a>
+                <a class="nav-link" href="<?= BASE_URL ?>account/profile.php">My Profile</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?= BASE_URL ?>auth/logout.php">Logout</a>

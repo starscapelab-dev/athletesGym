@@ -14,7 +14,7 @@ $password = $_POST['password'] ?? '';
 
 if (!$email || !$password) exit('All fields required.');
 
-$stmt = $pdo->prepare("SELECT id, name, password FROM users WHERE email = ?");
+$stmt = $pdo->prepare("SELECT id, name, password, email FROM users WHERE email = ?");
 $stmt->execute([$email]);
 $user = $stmt->fetch();
 
@@ -27,6 +27,7 @@ if ($user && password_verify($password, $user['password'])) {
 
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['user_name'] = $user['name'];
+    $_SESSION['user_email'] = $user['email'];
 
     // After successful login
     $userId = $user['id'];

@@ -46,6 +46,7 @@ try {
     $userId = $pdo->lastInsertId();
     $_SESSION['user_id'] = $userId;
     $_SESSION['user_name'] = $name;
+    $_SESSION['user_email'] = $email;
     
     // Merge guest cart to user account
     if ($guestCartId) {
