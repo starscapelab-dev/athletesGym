@@ -669,9 +669,10 @@ header.fixed-menu {
 }
 .product-options {
     margin-bottom: 16px;
+    text-align: left;
 }
 .product-swatches {
-    display: flex; gap: 8px; margin-bottom: 10px; justify-content: flex-start;
+    display: flex; gap: 8px; margin-bottom: 10px; justify-content: left;
 }
 .swatch {
     width: 30px; height: 30px; border-radius: 50%; border: 2px solid #ccc;
@@ -859,10 +860,11 @@ header.fixed-menu {
     font-weight: 600;
     display: none;
     animation: slideInUp 0.3s ease;
-    border-left: 3px solid #2da06a;
+   
     background: #f0f8f5;
     color: #1a5e3d;
     margin-top: 10px;
+    width: fit-content;
 }
 
 @keyframes slideInUp {

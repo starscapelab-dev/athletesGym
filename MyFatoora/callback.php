@@ -75,8 +75,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // $type_ticket = 'viptickets';
         // }
         // SECURITY FIX: Use prepared statement for transaction_id to prevent SQL injection
-        $update = $pdo->prepare("UPDATE orders SET payment_status = 'Paid', transaction_id = ? WHERE id = ?");
+        $update = $pdo->prepare("UPDATE orders SET payment_status = 'Paid', order_status = 'confirmed', transaction_id = ? WHERE id = ?");
         $update->execute([$keyId, $data['CustomerReference']]);
+
+        // ✅ DEDUCT STOCK ONLY AFTER PAYMENT IS CONFIRMED
+        $orderId = $data['CustomerReference'];
+        try {
+            $stockStmt = $pdo->prepare("
+                SELECT oi.variant_id, oi.quantity
+                FROM order_items oi
+                WHERE oi.order_id = ?
+            ");
+            $stockStmt->execute([$orderId]);
+            $orderItems = $stockStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($orderItems as $item) {
+                $pdo->prepare("UPDATE product_variants SET stock = stock - ? WHERE id = ?")
+                    ->execute([$item['quantity'], $item['variant_id']]);
+                error_log("✅ Stock deducted: Variant {$item['variant_id']}, Qty: {$item['quantity']}");
+            }
+        } catch (Exception $e) {
+            error_log("❌ Stock deduction error: " . $e->getMessage());
+        }
 
         // Send order confirmation email
         try {

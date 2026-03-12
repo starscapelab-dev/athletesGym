@@ -337,7 +337,7 @@ function updateStockStatus() {
         stockStatus.style.backgroundColor = "#f5f5f5";
         qtyInput.value = 0;
         qtyInput.disabled = true;
-    } else if (stock < 5) {
+    } else if (stock < 10) {
         addBtn.disabled = false;
         addBtn.classList.remove('btn-disabled');
         addBtn.textContent = "Add to Cart";
@@ -355,10 +355,7 @@ function updateStockStatus() {
         qtyInput.disabled = false;
         qtyInput.max = stock; // ✅ limit quantity field dynamically
         if (parseInt(qtyInput.value) > stock) qtyInput.value = stock;
-        stockStatus.textContent = "In Stock: " + stock + " available";
-        stockStatus.style.color = "#1a5e3d";
-        stockStatus.style.backgroundColor = "#f0f8f5";
-        stockStatus.style.display = "block";
+        stockStatus.style.display = "none";
     }
 }
 

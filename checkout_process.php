@@ -84,11 +84,7 @@ try {
         }
     }
 
-    // 2️⃣ Deduct stock
-    foreach ($items as $item) {
-        $pdo->prepare("UPDATE product_variants SET stock = stock - ? WHERE id=?")
-            ->execute([$item['quantity'], $item['variant_id']]);
-    }
+    // 2️⃣ Do NOT deduct stock yet - wait for payment confirmation
 
     // 3️⃣ Insert order
     $stmt = $pdo->prepare("

@@ -78,24 +78,12 @@ foreach ($variants as $v) {
             $stockResult = $stockStmt->fetch();
             $totalProductStock = $stockResult['total_stock'] ?? 0;
             ?>
-            <?php if ($totalProductStock > 0 && $totalProductStock < 5): ?>
-                <div style="margin-top: 12px; padding: 11px 14px; background: #f0f8f5; border-left: 3px solid #2da06a; border-radius: 6px; font-size: 13px; font-weight: 600; color: #1a5e3d; display: flex; align-items: center; gap: 8px; width: fit-content;">
-                    <span style="font-size: 17px;">⏱</span>
-                    <span>Only <?= $totalProductStock ?> item<?= $totalProductStock === 1 ? '' : 's' ?> left</span>
-                </div>
-            <?php elseif ($totalProductStock === 0): ?>
-                <div style="margin-top: 12px; padding: 11px 14px; background: #f5f5f5; border-left: 3px solid #999; border-radius: 6px; font-size: 13px; font-weight: 600; color: #666; display: flex; align-items: center; gap: 8px; width: fit-content;">
-                    <span style="font-size: 17px;">—</span>
-                    <span>Out of Stock</span>
-                </div>
-            <?php endif; ?>
-            
             <div class="product-description"><?=nl2br(htmlspecialchars($product['description']))?></div>
 
             <div class="product-options">
                 <!-- Colors -->
                 <?php if ($colors): ?>
-                    <div><strong>Color:</strong></div>
+                    <div style="margin-bottom: 8px;"><strong>Color:</strong></div>
                     <div class="product-swatches">
                         <?php foreach (array_keys($colors) as $i => $color): ?>
                             <span class="swatch <?=($i==0?'selected':'')?>" data-color="<?=htmlspecialchars($color)?>" style="background:<?=htmlspecialchars($color)?>"></span>
