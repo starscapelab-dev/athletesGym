@@ -52,10 +52,14 @@ if (!$items) {
 // Get customer info from form (or session if logged in)
 $name   = trim($_POST['name'] ?? ($_SESSION['user_name'] ?? ''));
 $email  = trim($_POST['email'] ?? ($_SESSION['user_email'] ?? ''));
+$country_code = trim($_POST['country_code'] ?? '+971');
 $phone  = trim($_POST['phone'] ?? '');
 $address = trim($_POST['address'] ?? '');
 $city    = trim($_POST['city'] ?? 'doha');
 $country = trim($_POST['country'] ?? 'Qatar');
+
+// Format phone with country code
+$full_phone = $country_code . $phone;
 
 // Calculate totals
 $subtotal = 0;
@@ -109,7 +113,7 @@ try {
         session_id(),
         $name,
         $email,
-        $phone,
+        $full_phone,
         $address,
         $city,
         $country,
@@ -198,18 +202,17 @@ try {
     $domain = $_SERVER['HTTP_HOST'];
     $baseCallbackUrl = $protocol . $domain;
 
-    // Format phone for MyFatoorah - must include country code 974
-    $formattedPhone = preg_replace('/[^0-9]/', '', $phone); // Remove non-numeric
-    if (!str_starts_with($formattedPhone, '974')) {
-        $formattedPhone = '974' . $formattedPhone;
-    }
+    // Format phone for MyFatoorah - extract numeric country code and phone
+    $countryCodeNumeric = preg_replace('/[^0-9]/', '', $country_code); // Extract digits from +971
+    $phoneNumeric = preg_replace('/[^0-9]/', '', $phone); // Extract digits from phone
+    $formattedPhone = $countryCodeNumeric . $phoneNumeric; // Combine them
 
     $postFields      = [
         'InvoiceValue' => $total,
         // 'InvoiceValue' => 1,
         "CurrencyIso"  => "QAR",
         "DisplayCurrencyIso"    => "QAR",
-        "MobileCountryCode" => "974",
+        "MobileCountryCode" => $countryCodeNumeric,
         "NotificationOption" =>  "ALL",
         "InvoiceItems" => $invoiceItems,
         "CustomerReference"  => $orderId,
@@ -230,7 +233,7 @@ try {
     error_log("Total Amount: " . $total);
     error_log("Customer Name: " . $name);
     error_log("Customer Email: " . $email);
-    error_log("Customer Phone (original): " . $phone);
+    error_log("Customer Phone (original): " . $full_phone);
     error_log("Customer Phone (formatted): " . $formattedPhone);
     error_log("Invoice Items Count: " . count($invoiceItems));
     error_log("Callback URL: " . $baseCallbackUrl . '/MyFatoora/callback.php');
