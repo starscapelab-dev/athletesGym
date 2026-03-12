@@ -54,7 +54,14 @@ if ($user && password_verify($password, $user['password'])) {
     }
 
 
-    header("Location: ../shop.php");
+    // Check if redirect parameter is set
+    $redirect = $_POST['redirect'] ?? '';
+    $redirectUrl = match($redirect) {
+        'checkout' => '../checkout.php',
+        default => '../shop.php'
+    };
+
+    header("Location: " . $redirectUrl);
     exit;
 } else {
     // ❌ Failure: store error in session & redirect back

@@ -1,6 +1,9 @@
 <?php
 require_once "../includes/csrf.php";
 require_once "../layouts/header-item.php";
+
+// Get the redirect parameter from URL
+$redirect = $_GET['redirect'] ?? '';
 ?>
 <div class="auth-container">
   <div class="auth-card auth-card-wide">
@@ -15,6 +18,9 @@ require_once "../layouts/header-item.php";
 
     <form action="register_handler.php" method="POST" autocomplete="off">
       <?php csrfField(); ?>
+      <?php if ($redirect): ?>
+        <input type="hidden" name="redirect" value="<?= htmlspecialchars($redirect) ?>">
+      <?php endif; ?>
 
       <div class="form-section-title">Personal Information</div>
       <div class="form-grid">

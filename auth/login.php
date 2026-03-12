@@ -5,6 +5,9 @@ $error = $_SESSION['login_error'] ?? '';
 $oldUsername = $_SESSION['old_username'] ?? '';
 unset($_SESSION['login_error'], $_SESSION['old_username']); // clear after showing
 
+// Get the redirect parameter from URL
+$redirect = $_GET['redirect'] ?? '';
+
 require_once "../includes/csrf.php";
 require_once "../layouts/header-item.php";
 ?>
@@ -18,6 +21,9 @@ require_once "../layouts/header-item.php";
     
     <form action="login_handler.php" method="POST" autocomplete="off">
       <?php csrfField(); ?>
+      <?php if ($redirect): ?>
+        <input type="hidden" name="redirect" value="<?= htmlspecialchars($redirect) ?>">
+      <?php endif; ?>
       <label>Email</label>
       <input type="email" name="email" required autofocus value="<?= htmlspecialchars($oldUsername) ?>">
       <label>Password</label>
@@ -30,13 +36,8 @@ require_once "../layouts/header-item.php";
       </div>
 
     </form>
-    <div class="auth-or">or</div>
-    <form action="guest_checkout.php" method="POST">
-      <?php csrfField(); ?>
-      <button type="submit" class="btn btn-guest">Continue as Guest</button>
-    </form>
     <div class="auth-link">
-      New here? <a href="register.php">Create an Account</a>
+      New here? <a href="register.php<?= $redirect ? '?redirect=' . urlencode($redirect) : '' ?>">Create an Account</a>
     </div>
   </div>
 </div>

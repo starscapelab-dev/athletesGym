@@ -63,11 +63,16 @@ $items = getCartItems($pdo);
               <div class="item-actions">
                 <form method="post" action="cards/cart_update.php" class="update-form">
                   <input type="hidden" name="item_id" value="<?= $item['cart_item_id'] ?>">
-                  <input type="number" name="qty" min="1" value="<?= $item['quantity'] ?>">
-                  <button type="submit" class="btn-update" style="color: black;">Update</button>
+                  <select name="qty" class="qty-select" onchange="this.form.submit();">
+                    <?php for ($i = 1; $i <= 10; $i++): ?>
+                      <option value="<?= $i ?>" <?= ($item['quantity'] === $i) ? 'selected' : '' ?>>
+                        <?= $i ?>
+                      </option>
+                    <?php endfor; ?>
+                  </select>
                 </form>
 
-                <form method="post" action="cards/cart_update.php" class="remove-form">
+                <form method="post" action="cards/cart_update.php" class="remove-form" style="margin: 0;">
                   <input type="hidden" name="item_id" value="<?= $item['cart_item_id'] ?>">
                   <input type="hidden" name="qty" value="0">
                   <button type="submit" class="btn-remove">Remove</button>

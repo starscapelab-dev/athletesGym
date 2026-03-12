@@ -33,6 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// ✅ REQUIRE LOGIN - No guest checkout allowed
+if (empty($_SESSION['user_id'])) {
+    header("Location: " . BASE_URL . "auth/login.php?redirect=checkout");
+    exit;
+}
+
 require_auth();
 
 // Session already started in session.php - no need to start again
@@ -44,8 +50,8 @@ if (!$items) {
     exit;
 }
 // Get customer info from form (or session if logged in)
-$name   = trim($_POST['name'] ?? ($_SESSION['user_name'] ?? 'Guest User'));
-$email  = trim($_POST['email'] ?? ($_SESSION['user_email'] ?? 'guest@example.com'));
+$name   = trim($_POST['name'] ?? ($_SESSION['user_name'] ?? ''));
+$email  = trim($_POST['email'] ?? ($_SESSION['user_email'] ?? ''));
 $phone  = trim($_POST['phone'] ?? '');
 $address = trim($_POST['address'] ?? '');
 $city    = trim($_POST['city'] ?? 'doha');

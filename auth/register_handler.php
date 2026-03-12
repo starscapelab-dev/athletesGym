@@ -33,7 +33,15 @@ try {
     $stmt->execute([$name, $email, $hash, $phone, $gender, $dob, $country, $city, $address]);
     $_SESSION['user_id'] = $pdo->lastInsertId();
     $_SESSION['user_name'] = $name;
-    header("Location: login.php");
+    
+    // Check if redirect parameter is set
+    $redirect = $_POST['redirect'] ?? '';
+    $redirectUrl = match($redirect) {
+        'checkout' => '../checkout.php',
+        default => '../shop.php'
+    };
+    
+    header("Location: " . $redirectUrl);
     exit;
 } catch (PDOException $e) {
     if ($e->errorInfo[1] == 1062) exit('Email already registered.');

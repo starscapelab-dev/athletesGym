@@ -7,8 +7,11 @@ require_once __DIR__ . "/includes/cart_functions.php";
 require_once __DIR__ . "/layouts/config.php";
 require_once __DIR__ . "/includes/csrf.php";
 
-
-require_auth();
+// ✅ REQUIRE LOGIN - No guest checkout allowed
+if (empty($_SESSION['user_id'])) {
+    header("Location: " . BASE_URL . "auth/login.php?redirect=checkout");
+    exit;
+}
 
 $items = getCartItems($pdo);
 if (!$items) {
