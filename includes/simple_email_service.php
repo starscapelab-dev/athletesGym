@@ -361,19 +361,26 @@ class SimpleEmailService {
     public function sendOrderNotificationToAdmin($orderData) {
         $subject = "🆕 New Order #{$orderData['order_id']} - {$orderData['customer_name']}";
 
-        $message = $this->getOrderAdminTemplate($orderData);
-
-        // Try to send directly without BCC to avoid filter issues
-        $headers = [
-            'Reply-To' => $orderData['customer_email'] ?? $this->fromEmail
-        ];
-
         // Log admin email details
         error_log("=== 📧 SENDING ADMIN NOTIFICATION ===");
         error_log("Admin Email: {$this->adminEmail}");
         error_log("Order ID: {$orderData['order_id']}");
         error_log("Customer: {$orderData['customer_name']}");
         error_log("Subject: {$subject}");
+
+        try {
+            $message = $this->getOrderAdminTemplate($orderData);
+            error_log("✅ Admin template generated, message length: " . strlen($message));
+        } catch (Exception $e) {
+            error_log("❌ Error generating admin template: " . $e->getMessage());
+            error_log("Exception trace: " . $e->getTraceAsString());
+            return false;
+        }
+
+        // Try to send directly without BCC to avoid filter issues
+        $headers = [
+            'Reply-To' => $orderData['customer_email'] ?? $this->fromEmail
+        ];
 
         $result = $this->send($this->adminEmail, $subject, $message, $headers);
         

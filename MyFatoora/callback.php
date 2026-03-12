@@ -191,6 +191,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     'shipping_address' => $order['address'] ?? '',
                     'order_date' => $order['created_at'],
                     'total' => $order['total'],
+                    'subtotal' => $order['subtotal'] ?? 0,
+                    'tax' => $order['tax'] ?? 0,
+                    'shipping_fee' => $order['shipping_fee'] ?? 0,
+                    'discount' => $order['discount'] ?? 0,
+                    'payment_method' => 'MyFatoorah',
+                    'order_status' => 'Processing',
                     'items' => array_map(function($item) {
                         return [
                             'name' => $item['product_name'],
