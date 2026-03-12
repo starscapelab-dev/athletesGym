@@ -2,8 +2,9 @@
 // Error reporting is now handled in db.php via environment configuration
 header('Content-Type: application/json');
 ob_start();
-session_start();
 
+// Use proper session handling from session.php
+require_once __DIR__ . "/../includes/session.php";
 require_once 'config.php';
 require_once __DIR__ . "/../admin/includes/db.php";
 require_once __DIR__ . "/../layouts/config.php";

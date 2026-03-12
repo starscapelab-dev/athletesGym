@@ -671,7 +671,7 @@ header.fixed-menu {
     margin-bottom: 16px;
 }
 .product-swatches {
-    display: flex; gap: 8px; margin-bottom: 10px;
+    display: flex; gap: 8px; margin-bottom: 10px; justify-content: flex-start;
 }
 .swatch {
     width: 30px; height: 30px; border-radius: 50%; border: 2px solid #ccc;
@@ -687,7 +687,7 @@ header.fixed-menu {
     background: #f9f9f9; font-size: 1em; font-weight: 600;
     margin-bottom: 6px; cursor: pointer; transition: border .13s;
 }
-.size-btn.selected, .size-btn:hover { border: 2px solid #0d9a6d; background: #e8ffe7;}
+.size-btn.selected, .size-btn:hover { border: 2px solid #555; background: #f5f5f5;}
 .size-btn[disabled] { opacity: .44; cursor: not-allowed; }
 .add-cart-row {
     margin-top: 23px;
@@ -726,7 +726,7 @@ header.fixed-menu {
     background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
     border: none;
     color: #111;
-    font-size: 1.4em;
+    font-size: 1.2em;
     font-weight: 700;
     width: 50px;
     height: 50px;
@@ -786,7 +786,7 @@ header.fixed-menu {
 .add-cart-row input[type='number'] {
     width: 80px;
     height: 50px;
-    font-size: 1.2em;
+    font-size: 1em;
     font-weight: 700;
     border: none;
     padding: 0;
@@ -806,7 +806,7 @@ header.fixed-menu {
     color: #fff;
     border: none;
     border-radius: 10px;
-    font-size: 1.1em;
+    font-size: 0.9em;
     font-weight: 700;
     padding: 14px 40px;
     cursor: pointer;

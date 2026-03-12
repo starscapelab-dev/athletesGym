@@ -163,7 +163,7 @@ $items = $stmt->fetchAll();
 <style>
 .order-details-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 30px;
   margin-bottom: 40px;
 }

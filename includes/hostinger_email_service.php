@@ -162,7 +162,7 @@ class HostingerEmailService {
         $subject = "Welcome to Athletes Gym Qatar!";
 
         $html = $this->getWelcomeTemplate($userName);
-        $text = "Hi {$userName},\n\nWelcome to Athletes Gym Qatar!\n\nYour account has been created successfully. You can now browse our products and place orders.\n\nVisit our website: " . env('APP_URL', 'https://athletesgym.qa') . "\n\nBest regards,\nAthletes Gym Qatar Team";
+        $text = "Hi {$userName},\n\nWelcome to Athletes Gym Qatar!\n\nYour account has been created successfully. You can now browse our products and place orders.\n\nVisit our website: " . rtrim(env('APP_URL', 'https://athletesgym.qa'), '/') . "\n\nBest regards,\nAthletes Gym Qatar Team";
 
         return $this->send($to, $subject, $html, $text);
     }
@@ -675,7 +675,7 @@ HTML;
      * Welcome Email Template
      */
     private function getWelcomeTemplate($userName) {
-        $siteUrl = env('APP_URL', 'https://athletesgym.qa');
+        $siteUrl = rtrim(env('APP_URL', 'https://athletesgym.qa'), '/');
 
         return <<<HTML
 <!DOCTYPE html>

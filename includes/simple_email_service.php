@@ -19,7 +19,7 @@ class SimpleEmailService {
         $this->fromName = env('MAIL_FROM_NAME', 'Athletes Gym Qatar');
         $this->adminEmail = env('MAIL_ADMIN_ADDRESS', 'athletesgymqa@gmail.com');
         $this->bccEmail = env('MAIL_BCC_ADDRESS', 'info@akshayvt.com');
-        $this->siteUrl = env('APP_URL', 'https://athletesgym.qa');
+        $this->siteUrl = rtrim(env('APP_URL', 'https://athletesgym.qa'), '/');
         $this->logoUrl = $this->siteUrl . '/assets/images/logo/logo-white.png';
     }
 

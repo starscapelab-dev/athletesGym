@@ -85,7 +85,7 @@ function getEmailTemplate($order, $items, $status) {
     $customerName = $order['customer_name'] ?? $order['full_name'];
     $orderDate = date('M d, Y', strtotime($order['created_at']));
     $total = number_format($order['total'], 2);
-    $siteUrl = env('APP_URL', 'https://athletesgym.qa');
+    $siteUrl = rtrim(env('APP_URL', 'https://athletesgym.qa'), '/');
 
     // Status-specific content
     $statusContent = getStatusContent($status, $orderId);
