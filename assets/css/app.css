@@ -1008,6 +1008,43 @@ header .navbar .navbar-collapse .navbar-nav .nav-item .nav-link.active {
     font-size: 24px;
 }
 
+/* User Profile Link Styling */
+header .navbar .navbar-collapse .navbar-nav .nav-item .user-profile-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 !important;
+}
+
+header .navbar .navbar-collapse .navbar-nav .nav-item .user-profile-link i {
+    font-size: 24px;
+}
+
+header .navbar .navbar-collapse .navbar-nav .nav-item .username-display {
+    display: inline-block;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
+}
+
+@media only screen and (max-width: 1399px) {
+    header .navbar .navbar-collapse .navbar-nav .nav-item .username-display {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 1199px) {
+    header .navbar .navbar-collapse .navbar-nav .nav-item .user-profile-link {
+        margin: 10px 0;
+    }
+    
+    header .navbar .navbar-collapse .navbar-nav .nav-item .user-profile-link i {
+        font-size: 20px;
+    }
+}
+
 header .navbar .navbar-collapse .navbar-nav .nav-item .dropdown-menu {
     border-radius: 0;
     border: none;

@@ -31,8 +31,26 @@ $hash = password_hash($password, PASSWORD_DEFAULT);
 $stmt = $pdo->prepare("INSERT INTO users (name, email, password, phone, gender, dob, country, city, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 try {
     $stmt->execute([$name, $email, $hash, $phone, $gender, $dob, $country, $city, $address]);
-    $_SESSION['user_id'] = $pdo->lastInsertId();
+    
+    // Capture the guest cart BEFORE session regeneration
+    $oldSessionId = session_id();
+    $guestCartId = null;
+    
+    $stmt = $pdo->prepare("SELECT id FROM carts WHERE session_id=? LIMIT 1");
+    $stmt->execute([$oldSessionId]);
+    $guestCartId = $stmt->fetchColumn();
+    
+    // Regenerate session ID for security
+    session_regenerate_id(true);
+    
+    $userId = $pdo->lastInsertId();
+    $_SESSION['user_id'] = $userId;
     $_SESSION['user_name'] = $name;
+    
+    // Merge guest cart to user account
+    if ($guestCartId) {
+        $pdo->prepare("UPDATE carts SET user_id=?, session_id=NULL WHERE id=?")->execute([$userId, $guestCartId]);
+    }
     
     // Check if redirect parameter is set
     $redirect = $_POST['redirect'] ?? '';

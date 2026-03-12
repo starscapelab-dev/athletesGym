@@ -19,6 +19,9 @@ $stmt->execute([$email]);
 $user = $stmt->fetch();
 
 if ($user && password_verify($password, $user['password'])) {
+    // Capture the OLD session ID BEFORE regenerating
+    $oldSessionId = session_id();
+    
     // SECURITY: Regenerate session ID to prevent session fixation
     session_regenerate_id(true);
 
@@ -27,11 +30,10 @@ if ($user && password_verify($password, $user['password'])) {
 
     // After successful login
     $userId = $user['id'];
-    $sessionId = session_id();
 
-    // Merge any guest cart to the user's cart
+    // Merge any guest cart to the user's cart using the OLD session ID
     $stmt = $pdo->prepare("SELECT id FROM carts WHERE session_id=? LIMIT 1");
-    $stmt->execute([$sessionId]);
+    $stmt->execute([$oldSessionId]);
     $guestCartId = $stmt->fetchColumn();
 
     if ($guestCartId) {
@@ -41,12 +43,12 @@ if ($user && password_verify($password, $user['password'])) {
         $userCartId = $stmt->fetchColumn();
 
         if (!$userCartId) {
-            $pdo->prepare("UPDATE carts SET user_id=? WHERE id=?")->execute([$userId, $guestCartId]);
+            $pdo->prepare("UPDATE carts SET user_id=?, session_id=NULL WHERE id=?")->execute([$userId, $guestCartId]);
             $userCartId = $guestCartId;
         } else {
             // Merge cart items
-            $merge = $pdo->prepare("UPDATE cart_items SET cart_id=?, user_id=? WHERE cart_id=?");
-            $merge->execute([$userCartId, $userId, $guestCartId]);
+            $merge = $pdo->prepare("UPDATE cart_items SET cart_id=? WHERE cart_id=?");
+            $merge->execute([$userCartId, $guestCartId]);
 
             // Delete old guest cart
             $pdo->prepare("DELETE FROM carts WHERE id=?")->execute([$guestCartId]);
