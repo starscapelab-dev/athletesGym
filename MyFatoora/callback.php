@@ -78,8 +78,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $update = $pdo->prepare("UPDATE orders SET payment_status = 'Paid', order_status = 'confirmed', transaction_id = ? WHERE id = ?");
         $update->execute([$keyId, $data['CustomerReference']]);
 
-        // ✅ DEDUCT STOCK ONLY AFTER PAYMENT IS CONFIRMED
         $orderId = $data['CustomerReference'];
+        
+        // Log order verification info
+        $verifyStmt = $pdo->prepare("SELECT id, customer_id, session_id FROM orders WHERE id = ?");
+        $verifyStmt->execute([$orderId]);
+        $verifiedOrder = $verifyStmt->fetch();
+        error_log("=== 📋 ORDER VERIFIED AFTER PAYMENT ===");
+        error_log("Order ID: {$orderId}");
+        error_log("Customer ID: " . ($verifiedOrder['customer_id'] ?? 'NULL (Guest)'));
+        error_log("Stored Session ID: " . ($verifiedOrder['session_id'] ?? 'NULL'));
+        error_log("Current Session ID: " . session_id());
+        error_log("User ID in Session: " . ($_SESSION['user_id'] ?? 'NULL (Guest)'));
+        error_log("=== ===");
+
+        // ✅ DEDUCT STOCK ONLY AFTER PAYMENT IS CONFIRMED
         try {
             $stockStmt = $pdo->prepare("
                 SELECT oi.variant_id, oi.quantity
@@ -192,6 +205,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     error_log("✅ Admin email sent successfully");
                 } else {
                     error_log("❌ Admin email FAILED to send");
+                    // Log failed notification to database as backup
+                    try {
+                        $adminEmail = env('MAIL_ADMIN_ADDRESS', 'athletesgymqa@gmail.com');
+                        $failureLog = $pdo->prepare("
+                            INSERT INTO email_logs (order_id, recipient, subject, status, created_at)
+                            VALUES (?, ?, ?, 'failed', NOW())
+                        ");
+                        $failureLog->execute([
+                            $orderId,
+                            $adminEmail,
+                            "New Order #{$orderId} - Failed Admin Notification"
+                        ]);
+                        error_log("⚠️ Failed email logged to database for manual review");
+                    } catch (Exception $logErr) {
+                        error_log("❌ Could not log failed email: " . $logErr->getMessage());
+                    }
                 }
             } else {
                 error_log("❌ Order not found or missing email - Order: " . print_r($order, true));

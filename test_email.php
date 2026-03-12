@@ -5,12 +5,17 @@
  * Access: http://yoursite.com/test_email.php
  */
 
-// Prevent public access - only localhost
-$allowed_ips = ['127.0.0.1', 'localhost', '::1'];
+// Prevent public access - only specific hosts
+$allowed_hosts = ['127.0.0.1', 'localhost', '::1', 'athletesgym.haziex.com'];
 $client_ip = $_SERVER['REMOTE_ADDR'] ?? '';
+$current_host = $_SERVER['HTTP_HOST'] ?? '';
 
-if (!in_array($client_ip, $allowed_ips) && strpos($_SERVER['HTTP_HOST'] ?? '', 'localhost') === false) {
-    die('Access denied. This test is only available on localhost.');
+$is_allowed = in_array($client_ip, $allowed_hosts) || 
+              strpos($current_host, 'athletesgym.haziex.com') !== false ||
+              strpos($current_host, 'localhost') !== false;
+
+if (!$is_allowed) {
+    die('Access denied. This test is only available on allowed hosts.');
 }
 
 // Load environment

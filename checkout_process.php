@@ -119,6 +119,13 @@ try {
     $orderId = $pdo->lastInsertId();
     // $orderId = '1234321';
 
+    // Log order creation
+    error_log("=== 📦 ORDER CREATED ===");
+    error_log("Order ID: {$orderId}");
+    error_log("Customer ID: " . ($_SESSION['user_id'] ?? 'NULL (Guest)'));
+    error_log("Session ID stored: " . session_id());
+    error_log("=== ===");
+
     // 4️⃣ Insert order items
     $invoiceItems = []; // Initialize array for MyFatoorah invoice items
     $stmtItem = $pdo->prepare("

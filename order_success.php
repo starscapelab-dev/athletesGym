@@ -93,11 +93,20 @@ if ($isPreview) {
     $userOwnsOrder = false;
     if (!empty($_SESSION['user_id']) && $order['customer_id'] == $_SESSION['user_id']) {
         $userOwnsOrder = true;
+        error_log("✅ Order access granted: Logged-in user {$_SESSION['user_id']} owns order {$orderId}");
     } elseif (!empty($order['session_id']) && $order['session_id'] === session_id()) {
         $userOwnsOrder = true;
+        error_log("✅ Order access granted: Session ID matches for order {$orderId}");
+    } elseif (empty($_SESSION['user_id']) && !empty($order['session_id'])) {
+        // Guest user - allow access if this is a guest order (no customer_id) or if session exists
+        if (empty($order['customer_id'])) {
+            $userOwnsOrder = true;
+            error_log("✅ Order access granted: Guest user viewing guest order {$orderId}");
+        }
     }
 
     if (!$userOwnsOrder) {
+        error_log("❌ Access denied for order {$orderId}. User ID: {$_SESSION['user_id']}, Order Customer ID: {$order['customer_id']}, Current Session: " . session_id() . ", Order Session: {$order['session_id']}");
         http_response_code(403);
         echo "<div class='container'><h2>Access Denied</h2><p>You do not have permission to view this order.</p></div>";
         require_once __DIR__ . "/layouts/footer.php";

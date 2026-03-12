@@ -248,12 +248,17 @@ class SimpleEmailService {
         error_log("Subject: {$subject}");
         error_log("From: {$this->fromEmail}");
         error_log("Environment: " . env('APP_ENV'));
+        error_log("Headers: " . str_replace("\r\n", " | ", $headerString));
         
         // Send email
         $success = @mail($to, $subject, $message, $headerString);
 
         if (!$success) {
-            error_log("❌ MAIL FUNCTION FAILED - To: {$to}, Subject: {$subject}, From: {$this->fromEmail}");
+            error_log("❌ MAIL FUNCTION FAILED");
+            error_log("To: {$to}");
+            error_log("Subject: {$subject}");
+            error_log("From: {$this->fromEmail}");
+            error_log("Message length: " . strlen($message) . " bytes");
         } else {
             error_log("✅ MAIL FUNCTION SUCCESS - To: {$to}");
         }
@@ -354,16 +359,41 @@ class SimpleEmailService {
      * Send order notification to admin
      */
     public function sendOrderNotificationToAdmin($orderData) {
-        $subject = "New Order #{$orderData['order_id']} - {$orderData['customer_name']}";
+        $subject = "🆕 New Order #{$orderData['order_id']} - {$orderData['customer_name']}";
 
         $message = $this->getOrderAdminTemplate($orderData);
 
+        // Try to send directly without BCC to avoid filter issues
         $headers = [
-            'Reply-To' => $orderData['customer_email'] ?? $this->fromEmail,
-            'BCC' => true
+            'Reply-To' => $orderData['customer_email'] ?? $this->fromEmail
         ];
 
-        return $this->send($this->adminEmail, $subject, $message, $headers);
+        // Log admin email details
+        error_log("=== 📧 SENDING ADMIN NOTIFICATION ===");
+        error_log("Admin Email: {$this->adminEmail}");
+        error_log("Order ID: {$orderData['order_id']}");
+        error_log("Customer: {$orderData['customer_name']}");
+        error_log("Subject: {$subject}");
+
+        $result = $this->send($this->adminEmail, $subject, $message, $headers);
+        
+        if ($result) {
+            error_log("✅ Admin email queued for delivery to {$this->adminEmail}");
+        } else {
+            error_log("❌ Admin email FAILED for {$this->adminEmail}");
+            // Try backup: send to BCC email as fallback
+            error_log("⚠️ Attempting backup delivery to BCC: {$this->bccEmail}");
+            try {
+                $backupResult = $this->send($this->bccEmail, "[BACKUP] {$subject}", $message, $headers);
+                if ($backupResult) {
+                    error_log("✅ Backup admin email sent to {$this->bccEmail}");
+                }
+            } catch (Exception $e) {
+                error_log("❌ Backup email also failed: " . $e->getMessage());
+            }
+        }
+
+        return $result;
     }
 
     /**
