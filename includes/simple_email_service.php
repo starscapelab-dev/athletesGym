@@ -250,6 +250,28 @@ class SimpleEmailService {
         error_log("Environment: " . env('APP_ENV'));
         error_log("Headers: " . str_replace("\r\n", " | ", $headerString));
         
+        // Check if mail() function is available
+        if (!function_exists('mail')) {
+            error_log("❌ CRITICAL: mail() function is not available!");
+            error_log("⚠️ Check php.ini: disable_functions setting");
+            return false;
+        }
+        
+        // Check sendmail configuration on non-Windows systems
+        if (PHP_OS_FAMILY !== 'Windows') {
+            $sendmailPath = ini_get('sendmail_path');
+            if (empty($sendmailPath)) {
+                error_log("❌ CRITICAL: sendmail_path is not configured!");
+                error_log("⚠️ Check php.ini: sendmail_path setting");
+                return false;
+            }
+        } else {
+            // Windows: check SMTP and smtp_port settings
+            $smtp = ini_get('SMTP');
+            $smtpPort = ini_get('smtp_port');
+            error_log("Windows SMTP Config - SMTP: {$smtp}, Port: {$smtpPort}");
+        }
+        
         // Send email
         $success = @mail($to, $subject, $message, $headerString);
 
@@ -259,6 +281,9 @@ class SimpleEmailService {
             error_log("Subject: {$subject}");
             error_log("From: {$this->fromEmail}");
             error_log("Message length: " . strlen($message) . " bytes");
+            error_log("⚠️ Check error_log for mail() system errors");
+            error_log("⚠️ On Hostinger: Check if sendmail is running");
+            error_log("⚠️ Common fix: Contact hosting provider to verify mail service");
         } else {
             error_log("✅ MAIL FUNCTION SUCCESS - To: {$to}");
         }
