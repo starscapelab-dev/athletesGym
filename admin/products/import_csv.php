@@ -41,14 +41,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
             // Read header row
             $headers = fgetcsv($handle);
 
-            if (!$headers || !in_array('Name', $headers)) {
-                $errors[] = "Invalid CSV format. Required column: Name";
+            // Normalize headers (trim and convert to uppercase for comparison)
+            $normalizedHeaders = array_map(function($h) { return strtoupper(trim($h)); }, $headers);
+
+            // Required columns
+            $requiredColumns = ['CODE', 'PRODUCT NAME', '1 UNIT COST (QR)'];
+            $missingColumns = array_diff($requiredColumns, $normalizedHeaders);
+
+            if (!empty($missingColumns)) {
+                $errors[] = "Invalid CSV format. Missing required columns: " . implode(', ', $missingColumns);
             } else {
                 $rowNumber = 1;
 
                 try {
                     $pdo->beginTransaction();
 
+                    // Track products and their variants
+                    $productsToProcess = [];
+
+                    // First pass: Group variants by product code
                     while (($data = fgetcsv($handle)) !== false) {
                         $rowNumber++;
 
@@ -60,77 +71,119 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                         // Map data to associative array
                         $row = array_combine($headers, $data);
 
+                        // Extract and trim data
+                        $code = !empty($row['CODE']) ? trim($row['CODE']) : null;
+                        $productName = !empty($row['PRODUCT NAME']) ? trim($row['PRODUCT NAME']) : null;
+                        $size = !empty($row['SIZE']) ? trim($row['SIZE']) : null;
+                        $quantity = isset($row['QUANTITY']) ? intval($row['QUANTITY']) : 0;
+                        $unitCost = !empty($row['1 UNIT COST (QR)']) ? floatval($row['1 UNIT COST (QR)']) : 0;
+                        $category = !empty($row['CATEGORY']) ? strtolower(trim($row['CATEGORY'])) : 'unisex';
+
                         // Validate required fields
-                        if (empty($row['Name'])) {
+                        if (empty($productName) || $unitCost <= 0) {
                             $skippedCount++;
                             continue;
                         }
 
-                        // Check if updating existing product
-                        $productId = !empty($row['ID']) ? intval($row['ID']) : null;
-
-                        // Prepare data
-                        $name = trim($row['Name']);
-                        $description = isset($row['Description']) ? trim($row['Description']) : '';
-                        $categoryId = isset($row['Category ID']) && !empty($row['Category ID']) ? intval($row['Category ID']) : null;
-                        $gender = isset($row['Gender']) && !empty($row['Gender']) ? trim($row['Gender']) : 'Unisex';
-                        $type = isset($row['Type']) && !empty($row['Type']) ? trim($row['Type']) : 'Standard';
-                        $price = isset($row['Price']) && !empty($row['Price']) ? floatval($row['Price']) : 0;
-                        $stockThreshold = isset($row['Stock Threshold']) && !empty($row['Stock Threshold']) ? intval($row['Stock Threshold']) : 10;
-
-                        // Validate price
-                        if ($price <= 0) {
-                            $errors[] = "Row $rowNumber: Invalid price for product '$name'";
-                            $skippedCount++;
-                            continue;
+                        // Store product data
+                        if (!isset($productsToProcess[$code])) {
+                            $productsToProcess[$code] = [
+                                'name' => $productName,
+                                'price' => $unitCost,
+                                'category' => $category,
+                                'variants' => []
+                            ];
                         }
 
-                        // Update existing product
-                        if ($productId) {
-                            $stmt = $pdo->prepare("
+                        // Add variant if size is provided
+                        if (!empty($size)) {
+                            $productsToProcess[$code]['variants'][] = [
+                                'size' => $size,
+                                'quantity' => $quantity,
+                                'price' => $unitCost
+                            ];
+                        }
+                    }
+
+                    // Second pass: Process products
+                    foreach ($productsToProcess as $code => $productData) {
+                        $productName = $productData['name'];
+                        $price = $productData['price'];
+                        $gender = $productData['category'];
+
+                        // Find or get default category (use first available)
+                        $categoryStmt = $pdo->query("SELECT id FROM categories ORDER BY id LIMIT 1");
+                        $categoryRow = $categoryStmt->fetch(PDO::FETCH_ASSOC);
+                        $categoryId = $categoryRow ? $categoryRow['id'] : 1;
+
+                        // Check if product exists by code
+                        $checkStmt = $pdo->prepare("SELECT id FROM products WHERE id = ? OR name = ?");
+                        $checkStmt->execute([$code, $productName]);
+                        $existingProduct = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+                        if ($existingProduct) {
+                            // Update existing product
+                            $productId = $existingProduct['id'];
+                            $updateStmt = $pdo->prepare("
                                 UPDATE products SET
                                     name = ?,
-                                    description = ?,
-                                    category_id = ?,
-                                    gender = ?,
-                                    type = ?,
                                     price = ?,
-                                    stock_threshold = ?,
-                                    updated_at = NOW()
+                                    gender = ?,
+                                    category_id = ?
                                 WHERE id = ?
                             ");
-                            $stmt->execute([
-                                $name,
-                                $description,
-                                $categoryId,
-                                $gender,
-                                $type,
-                                $price,
-                                $stockThreshold,
-                                $productId
-                            ]);
+                            $updateStmt->execute([$productName, $price, $gender, $categoryId, $productId]);
 
-                            if ($stmt->rowCount() > 0) {
-                                $updatedCount++;
-                            } else {
-                                $skippedCount++;
-                            }
+                            // Delete existing variants
+                            $deleteVariantsStmt = $pdo->prepare("DELETE FROM product_variants WHERE product_id = ?");
+                            $deleteVariantsStmt->execute([$productId]);
+
+                            $updatedCount++;
                         } else {
                             // Insert new product
-                            $stmt = $pdo->prepare("
-                                INSERT INTO products (name, description, category_id, gender, type, price, stock_threshold, created_at, updated_at)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+                            $insertStmt = $pdo->prepare("
+                                INSERT INTO products (id, name, price, gender, category_id, active, created_at)
+                                VALUES (?, ?, ?, ?, ?, 1, NOW())
                             ");
-                            $stmt->execute([
-                                $name,
-                                $description,
-                                $categoryId,
-                                $gender,
-                                $type,
-                                $price,
-                                $stockThreshold
-                            ]);
+                            $insertStmt->execute([$code, $productName, $price, $gender, $categoryId]);
+                            $productId = !empty($code) ? $code : $pdo->lastInsertId();
                             $importedCount++;
+                        }
+
+                        // Insert variants
+                        if (!empty($productData['variants'])) {
+                            $variantStmt = $pdo->prepare("
+                                INSERT INTO product_variants (product_id, size_id, color_id, stock, price)
+                                VALUES (?, ?, ?, ?, ?)
+                            ");
+
+                            // Get default color (usually Black, ID 1)
+                            $colorId = 1;
+
+                            foreach ($productData['variants'] as $variant) {
+                                // Find or create size
+                                $sizeStmt = $pdo->prepare("SELECT id FROM sizes WHERE UPPER(name) = UPPER(?)");
+                                $sizeStmt->execute([$variant['size']]);
+                                $sizeRow = $sizeStmt->fetch(PDO::FETCH_ASSOC);
+
+                                if ($sizeRow) {
+                                    $sizeId = $sizeRow['id'];
+                                } else {
+                                    // Create new size
+                                    $insertSizeStmt = $pdo->prepare("INSERT INTO sizes (name) VALUES (?)");
+                                    $insertSizeStmt->execute([$variant['size']]);
+                                    $sizeId = $pdo->lastInsertId();
+                                }
+
+                                // Insert variant
+                                $variantStmt->execute([
+                                    $productId,
+                                    $sizeId,
+                                    $colorId,
+                                    $variant['quantity'],
+                                    $variant['price']
+                                ]);
+                            }
                         }
                     }
 
@@ -192,11 +245,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
         <div class="info-box" style="margin-bottom: 20px; padding: 15px; background: #e8f4f8; border-left: 4px solid #2196F3; border-radius: 4px;">
             <strong>📋 CSV Format Requirements:</strong>
             <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
-                <li><strong>Required columns:</strong> Name, Price</li>
-                <li><strong>Optional columns:</strong> ID (for updates), Description, Category ID, Gender, Type, Stock Threshold</li>
-                <li><strong>To update existing products:</strong> Include the product ID in the CSV</li>
-                <li><strong>Gender options:</strong> Men, Women, Unisex</li>
-                <li><strong>Type options:</strong> Standard, Premium, Limited Edition</li>
+                <li><strong>Required columns:</strong> CODE, PRODUCT NAME, 1 UNIT COST (QR)</li>
+                <li><strong>Optional columns:</strong> SIZE, QUANTITY, CATEGORY</li>
+                <li><strong>Format:</strong> Each row represents one size variant of a product</li>
+                <li><strong>Example:</strong> Product "JACKET" with sizes XL, L, M, S = 4 rows with same CODE</li>
+                <li><strong>Category options:</strong> WOMENS, MENS, UNISEX, ACCESSORIES</li>
+                <li><strong>To update existing products:</strong> Use the same CODE as existing product</li>
             </ul>
             <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #b3d9e8;">
                 <a href="export_csv.php" class="btn btn-small" style="display: inline-block; padding: 8px 16px; background: #2196F3; color: white; text-decoration: none; border-radius: 4px; font-size: 14px;">
