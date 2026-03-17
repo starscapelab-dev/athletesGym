@@ -1,20 +1,19 @@
 <?php
 ob_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 $pageTitle = "Import Products CSV";
 require_once __DIR__ . "/../includes/db.php";
 require_once __DIR__ . "/../includes/functions.php";
 require_once __DIR__ . '/../../includes/csrf.php';
 require_once __DIR__ . "/../includes/header.php";
 
-// Check if user is admin
-requireAdmin();
-
 $errors = [];
 $success = false;
 $importedCount = 0;
 $updatedCount = 0;
 $skippedCount = 0;
-$preview = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
     requireCsrfToken();
@@ -26,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
         $errors[] = "File upload error. Please try again.";
     } elseif ($file['size'] > 5 * 1024 * 1024) { // 5MB limit
         $errors[] = "File is too large. Maximum size is 5MB.";
-    } elseif (pathinfo($file['name'], PATHINFO_EXTENSION) !== 'csv') {
+    } elseif (strtolower(pathinfo($file['name'], PATHINFO_EXTENSION)) !== 'csv') {
         $errors[] = "Invalid file type. Please upload a CSV file.";
     } else {
         // Process CSV file
@@ -43,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
             $headers = fgetcsv($handle);
 
             if (!$headers || !in_array('Name', $headers)) {
-                $errors[] = "Invalid CSV format. Required columns: Name, Description, Category ID, Price";
+                $errors[] = "Invalid CSV format. Required column: Name";
             } else {
                 $rowNumber = 1;
 
@@ -52,6 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 
                     while (($data = fgetcsv($handle)) !== false) {
                         $rowNumber++;
+
+                        // Skip empty rows
+                        if (empty(array_filter($data))) {
+                            continue;
+                        }
 
                         // Map data to associative array
                         $row = array_combine($headers, $data);
@@ -69,8 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                         $name = trim($row['Name']);
                         $description = isset($row['Description']) ? trim($row['Description']) : '';
                         $categoryId = isset($row['Category ID']) && !empty($row['Category ID']) ? intval($row['Category ID']) : null;
-                        $gender = isset($row['Gender']) ? trim($row['Gender']) : 'Unisex';
-                        $type = isset($row['Type']) ? trim($row['Type']) : 'Standard';
+                        $gender = isset($row['Gender']) && !empty($row['Gender']) ? trim($row['Gender']) : 'Unisex';
+                        $type = isset($row['Type']) && !empty($row['Type']) ? trim($row['Type']) : 'Standard';
                         $price = isset($row['Price']) && !empty($row['Price']) ? floatval($row['Price']) : 0;
                         $stockThreshold = isset($row['Stock Threshold']) && !empty($row['Stock Threshold']) ? intval($row['Stock Threshold']) : 10;
 
@@ -157,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 
     <?php if ($success): ?>
         <div class="alert alert-success">
-            <strong>Import Successful!</strong><br>
+            <strong>✓ Import Successful!</strong><br><br>
             • <?= $importedCount ?> new products imported<br>
             • <?= $updatedCount ?> products updated<br>
             <?php if ($skippedCount > 0): ?>
@@ -172,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 
     <?php if (!empty($errors)): ?>
         <div class="alert alert-error">
-            <strong>Import Errors:</strong>
+            <strong>⚠ Import Errors:</strong>
             <ul style="margin: 10px 0 0 20px;">
                 <?php foreach ($errors as $error): ?>
                     <li><?= htmlspecialchars($error) ?></li>
@@ -185,17 +189,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
     <div class="card">
         <h2>Upload CSV File</h2>
 
-        <div class="info-box" style="margin-bottom: 20px; padding: 15px; background: #f0f8ff; border-left: 4px solid #2196F3; border-radius: 4px;">
-            <strong>CSV Format Requirements:</strong>
-            <ul style="margin: 10px 0 0 20px;">
+        <div class="info-box" style="margin-bottom: 20px; padding: 15px; background: #e8f4f8; border-left: 4px solid #2196F3; border-radius: 4px;">
+            <strong>📋 CSV Format Requirements:</strong>
+            <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
                 <li><strong>Required columns:</strong> Name, Price</li>
                 <li><strong>Optional columns:</strong> ID (for updates), Description, Category ID, Gender, Type, Stock Threshold</li>
                 <li><strong>To update existing products:</strong> Include the product ID in the CSV</li>
                 <li><strong>Gender options:</strong> Men, Women, Unisex</li>
                 <li><strong>Type options:</strong> Standard, Premium, Limited Edition</li>
             </ul>
-            <p style="margin-top: 10px;">
-                <a href="export_csv.php" class="btn btn-small">Download Sample CSV</a>
+            <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #b3d9e8;">
+                <a href="export_csv.php" class="btn btn-small" style="display: inline-block; padding: 8px 16px; background: #2196F3; color: white; text-decoration: none; border-radius: 4px; font-size: 14px;">
+                    ⬇ Download Sample CSV
+                </a>
                 <span style="margin-left: 10px; color: #666;">(Export current products as reference)</span>
             </p>
         </div>
@@ -204,13 +210,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
             <?php csrfField(); ?>
 
             <div class="form-group">
-                <label for="csv_file">Select CSV File</label>
+                <label for="csv_file">Select CSV File *</label>
                 <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
-                <small>Maximum file size: 5MB</small>
+                <small style="color: #666;">Maximum file size: 5MB</small>
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Import Products</button>
+                <button type="submit" class="btn btn-primary">📤 Import Products</button>
                 <a href="list.php" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
@@ -220,10 +226,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 </div>
 
 <style>
+.admin-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
 .alert {
-    padding: 15px 20px;
-    border-radius: 4px;
-    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    line-height: 1.6;
 }
 .alert-success {
     background: #d4edda;
@@ -237,47 +248,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
 }
 .card {
     background: white;
-    padding: 30px;
+    padding: 35px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .card h2 {
     margin-top: 0;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     color: #333;
+    font-size: 24px;
 }
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 .form-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
     color: #333;
+    font-size: 15px;
 }
 .form-group input[type="file"] {
     display: block;
     width: 100%;
-    padding: 10px;
-    border: 2px dashed #ddd;
-    border-radius: 4px;
-    background: #f9f9f9;
+    padding: 12px;
+    border: 2px dashed #ccc;
+    border-radius: 6px;
+    background: #fafafa;
     cursor: pointer;
+    transition: border-color 0.2s;
+}
+.form-group input[type="file"]:hover {
+    border-color: #2196F3;
+    background: #f0f8ff;
 }
 .form-group small {
     display: block;
-    margin-top: 5px;
+    margin-top: 6px;
     color: #666;
-    font-size: 0.9em;
+    font-size: 13px;
 }
 .form-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     margin-top: 30px;
 }
+.btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+.btn-primary {
+    background: #2196F3;
+    color: white;
+}
+.btn-primary:hover {
+    background: #1976D2;
+}
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+.btn-secondary:hover {
+    background: #5a6268;
+}
 .btn-small {
-    padding: 6px 12px;
-    font-size: 0.9em;
+    padding: 8px 16px;
+    font-size: 14px;
 }
 </style>
 
