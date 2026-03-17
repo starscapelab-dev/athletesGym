@@ -1,0 +1,4 @@
+ID,Name,Description,Category ID,Category Name,Gender,Type,Price,Stock Threshold,Created At,Updated At
+,Sample Product 1,This is a sample product description,1,Supplements,Men,Standard,299.00,10,,
+,Sample Product 2,Another sample product,2,Clothing,Women,Premium,499.00,5,,
+1,Update Existing Product,Updated description for product ID 1,1,Supplements,Unisex,Standard,349.00,15,,

@@ -20,8 +20,53 @@ $products = $stmt->fetchAll();
 ?>
 <div class="admin-page-header">
   <h1>Products</h1>
-  <a href="add.php" class="btn btn-primary">+ Add Product</a>
+  <div class="header-actions">
+    <a href="import_csv.php" class="btn btn-secondary" style="margin-right: 10px;">
+      <i class="fas fa-file-import"></i> Import CSV
+    </a>
+    <a href="export_csv.php" class="btn btn-secondary" style="margin-right: 10px;">
+      <i class="fas fa-file-export"></i> Export CSV
+    </a>
+    <a href="add.php" class="btn btn-primary">+ Add Product</a>
+  </div>
 </div>
+
+<style>
+.admin-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.btn-secondary:hover {
+  background-color: #5a6268;
+  color: white;
+}
+.btn-secondary i {
+  font-size: 14px;
+}
+</style>
 
 <table class="admin-table">
   <thead>
