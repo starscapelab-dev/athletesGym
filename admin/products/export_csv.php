@@ -18,18 +18,19 @@ $output = fopen('php://output', 'w');
 // Add UTF-8 BOM for proper Excel compatibility
 fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
-// CSV Headers matching client's format
+// CSV Headers matching client's format + image support
 fputcsv($output, [
     'CODE',
     'SIZE',
     'QUANTITY',
     '1 UNIT COST (QR)',
     'CATEGORY',
-    'PRODUCT NAME'
+    'PRODUCT NAME',
+    'PHOTO'
 ]);
 
 try {
-    // Fetch all products with their variants
+    // Fetch all products with their variants and images
     $stmt = $pdo->query("
         SELECT
             p.id as product_code,
@@ -39,17 +40,31 @@ try {
             p.price,
             s.name as size_name,
             pv.stock as quantity,
-            pv.price as variant_price
+            pv.price as variant_price,
+            GROUP_CONCAT(DISTINCT pi.image_path SEPARATOR '|') as images
         FROM products p
         LEFT JOIN categories c ON p.category_id = c.id
         LEFT JOIN product_variants pv ON pv.product_id = p.id
         LEFT JOIN sizes s ON pv.size_id = s.id
+        LEFT JOIN product_images pi ON pi.product_id = p.id
         WHERE p.active = 1
+        GROUP BY p.id, pv.id, s.name
         ORDER BY p.id ASC, s.name ASC
     ");
 
     // Track if product has been output (for products without variants)
     $productsOutput = [];
+    $productImages = [];
+
+    // First, get all product images
+    $imageStmt = $pdo->query("
+        SELECT product_id, GROUP_CONCAT(image_path SEPARATOR '|') as images
+        FROM product_images
+        GROUP BY product_id
+    ");
+    while ($imgRow = $imageStmt->fetch(PDO::FETCH_ASSOC)) {
+        $productImages[$imgRow['product_id']] = $imgRow['images'];
+    }
 
     // Write product data
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -59,6 +74,7 @@ try {
         $size = $row['size_name'] ?? '';
         $quantity = $row['quantity'] ?? 0;
         $unitCost = $row['variant_price'] ?? $row['price'] ?? 0;
+        $images = $productImages[$code] ?? '';
 
         // If product has variants, output each variant as a row
         if (!empty($size)) {
@@ -68,7 +84,8 @@ try {
                 $quantity,
                 number_format($unitCost, 2, '.', ''),
                 $category,
-                $productName
+                $productName,
+                $images
             ]);
             $productsOutput[$code] = true;
         }
@@ -80,7 +97,8 @@ try {
                 0,
                 number_format($unitCost, 2, '.', ''),
                 $category,
-                $productName
+                $productName,
+                $images
             ]);
             $productsOutput[$code] = true;
         }

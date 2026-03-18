@@ -78,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                         $quantity = isset($row['QUANTITY']) ? intval($row['QUANTITY']) : 0;
                         $unitCost = !empty($row['1 UNIT COST (QR)']) ? floatval($row['1 UNIT COST (QR)']) : 0;
                         $category = !empty($row['CATEGORY']) ? strtolower(trim($row['CATEGORY'])) : 'unisex';
+                        $photo = isset($row['PHOTO']) && !empty($row['PHOTO']) ? trim($row['PHOTO']) : '';
 
                         // Validate required fields
                         if (empty($productName) || $unitCost <= 0) {
@@ -91,6 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                                 'name' => $productName,
                                 'price' => $unitCost,
                                 'category' => $category,
+                                'images' => $photo,
                                 'variants' => []
                             ];
                         }
@@ -185,6 +187,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                                 ]);
                             }
                         }
+
+                        // Handle product images (URLs separated by | pipe)
+                        if (!empty($productData['images'])) {
+                            // Delete existing images for this product
+                            $deleteImagesStmt = $pdo->prepare("DELETE FROM product_images WHERE product_id = ?");
+                            $deleteImagesStmt->execute([$productId]);
+
+                            // Split multiple image URLs
+                            $imageUrls = explode('|', $productData['images']);
+                            $imageStmt = $pdo->prepare("INSERT INTO product_images (product_id, image_path, alt_text) VALUES (?, ?, ?)");
+                            $uploadDir = __DIR__ . '/../../uploads/';
+
+                            // Create uploads directory if it doesn't exist
+                            if (!is_dir($uploadDir)) {
+                                mkdir($uploadDir, 0755, true);
+                            }
+
+                            foreach ($imageUrls as $imageUrl) {
+                                $imageUrl = trim($imageUrl);
+                                if (empty($imageUrl)) continue;
+
+                                // Check if it's a URL or existing filename
+                                if (filter_var($imageUrl, FILTER_VALIDATE_URL)) {
+                                    // Download image from URL
+                                    try {
+                                        $imageData = @file_get_contents($imageUrl);
+                                        if ($imageData !== false) {
+                                            $ext = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
+                                            if (empty($ext)) $ext = 'jpg';
+                                            $newFilename = 'img_' . uniqid() . '.' . $ext;
+                                            $uploadPath = $uploadDir . $newFilename;
+
+                                            if (file_put_contents($uploadPath, $imageData)) {
+                                                $imageStmt->execute([$productId, $newFilename, $productName]);
+                                            }
+                                        }
+                                    } catch (Exception $e) {
+                                        error_log("Failed to download image from URL: $imageUrl - " . $e->getMessage());
+                                    }
+                                } else {
+                                    // Existing filename in uploads folder
+                                    if (file_exists($uploadDir . $imageUrl)) {
+                                        $imageStmt->execute([$productId, $imageUrl, $productName]);
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     $pdo->commit();
@@ -246,10 +295,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
             <strong>📋 CSV Format Requirements:</strong>
             <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
                 <li><strong>Required columns:</strong> CODE, PRODUCT NAME, 1 UNIT COST (QR)</li>
-                <li><strong>Optional columns:</strong> SIZE, QUANTITY, CATEGORY</li>
+                <li><strong>Optional columns:</strong> SIZE, QUANTITY, CATEGORY, PHOTO</li>
                 <li><strong>Format:</strong> Each row represents one size variant of a product</li>
                 <li><strong>Example:</strong> Product "JACKET" with sizes XL, L, M, S = 4 rows with same CODE</li>
                 <li><strong>Category options:</strong> WOMENS, MENS, UNISEX, ACCESSORIES</li>
+                <li><strong>Product Images:</strong> Add image URLs in PHOTO column (only need on first variant row)</li>
+                <li><strong>Multiple Images:</strong> Separate URLs with pipe | symbol (e.g., url1.jpg|url2.jpg|url3.jpg)</li>
                 <li><strong>To update existing products:</strong> Use the same CODE as existing product</li>
             </ul>
             <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #b3d9e8;">
