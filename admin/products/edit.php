@@ -87,39 +87,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
 
-    // Upload new image
+    // Upload new image(s)
     elseif ($action === 'upload_image') {
-        if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === 0) {
+        if (isset($_FILES['product_images']) && is_array($_FILES['product_images']['name'])) {
             $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-            $filename = $_FILES['product_image']['name'];
-            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            $upload_dir = __DIR__ . '/../../uploads/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0755, true);
+            }
 
-            if (in_array($ext, $allowed)) {
-                $upload_dir = __DIR__ . '/../../uploads/';
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0755, true);
+            $uploadedCount = 0;
+            $errorCount = 0;
+
+            for ($i = 0; $i < count($_FILES['product_images']['name']); $i++) {
+                if ($_FILES['product_images']['error'][$i] === 0) {
+                    $filename = $_FILES['product_images']['name'][$i];
+                    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+                    if (in_array($ext, $allowed)) {
+                        // Check file size (5MB max)
+                        if ($_FILES['product_images']['size'][$i] > 5 * 1024 * 1024) {
+                            $errorCount++;
+                            continue;
+                        }
+
+                        $new_filename = 'img_' . uniqid() . '.' . $ext;
+                        $upload_path = $upload_dir . $new_filename;
+
+                        if (move_uploaded_file($_FILES['product_images']['tmp_name'][$i], $upload_path)) {
+                            $alt_text = $product['name'] ?? '';
+                            $insertImg = $pdo->prepare("INSERT INTO product_images (product_id, image_path, alt_text) VALUES (?, ?, ?)");
+                            $insertImg->execute([$id, $new_filename, $alt_text]);
+                            $uploadedCount++;
+                        } else {
+                            $errorCount++;
+                        }
+                    } else {
+                        $errorCount++;
+                    }
+                }
+            }
+
+            if ($uploadedCount > 0) {
+                $success = "$uploadedCount image(s) uploaded successfully!";
+                if ($errorCount > 0) {
+                    $success .= " ($errorCount failed)";
                 }
 
-                $new_filename = 'img_' . uniqid() . '.' . $ext;
-                $upload_path = $upload_dir . $new_filename;
-
-                if (move_uploaded_file($_FILES['product_image']['tmp_name'], $upload_path)) {
-                    $alt_text = trim($_POST['alt_text'] ?? '');
-                    $insertImg = $pdo->prepare("INSERT INTO product_images (product_id, image_path, alt_text) VALUES (?, ?, ?)");
-                    $insertImg->execute([$id, $new_filename, $alt_text]);
-                    $success = "Image uploaded successfully!";
-
-                    // Refresh images
-                    $imagesStmt->execute([$id]);
-                    $images = $imagesStmt->fetchAll();
-                } else {
-                    $error = "Failed to upload image.";
-                }
+                // Refresh images
+                $imagesStmt->execute([$id]);
+                $images = $imagesStmt->fetchAll();
             } else {
-                $error = "Invalid file type. Allowed: " . implode(', ', $allowed);
+                $error = "Failed to upload images. Please check file types and sizes (max 5MB each).";
             }
         } else {
-            $error = "Please select an image to upload.";
+            $error = "Please select images to upload.";
         }
     }
 
@@ -366,19 +388,17 @@ require_once __DIR__ . "/../includes/header.php";
 
         <div class="form-row">
             <div class="form-group">
-                <label for="product_image">Select Image <span class="required">*</span></label>
-                <input type="file" name="product_image" id="product_image" accept="image/*" required>
-                <small class="form-hint">Allowed: JPG, PNG, GIF, WEBP (Max 5MB)</small>
-            </div>
-
-            <div class="form-group">
-                <label for="alt_text">Alt Text (Optional)</label>
-                <input type="text" name="alt_text" id="alt_text" placeholder="Describe the image...">
+                <label for="product_image">Select Images <span class="required">*</span></label>
+                <input type="file" name="product_images[]" id="product_image" accept="image/*" multiple required>
+                <small class="form-hint">Select multiple images at once - Allowed: JPG, PNG, GIF, WEBP (Max 5MB each)</small>
+                <div id="editImageCount" style="margin-top: 8px; color: #0066cc; font-weight: 500; display: none;">
+                    <span id="editSelectedCount">0</span> image(s) selected
+                </div>
             </div>
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Upload Image</button>
+            <button type="submit" class="btn btn-primary">Upload Images</button>
             <button type="button" class="btn btn-secondary" onclick="toggleSection('upload-image-form')">Cancel</button>
         </div>
     </form>
@@ -605,6 +625,23 @@ document.addEventListener('keydown', function(e) {
         closeEditModal();
     }
 });
+
+// Handle multiple image selection count display
+const editImageInput = document.getElementById('product_image');
+if (editImageInput) {
+    editImageInput.addEventListener('change', function() {
+        const fileCount = this.files.length;
+        const countDisplay = document.getElementById('editImageCount');
+        const countSpan = document.getElementById('editSelectedCount');
+
+        if (fileCount > 0) {
+            countSpan.textContent = fileCount;
+            countDisplay.style.display = 'block';
+        } else {
+            countDisplay.style.display = 'none';
+        }
+    });
+}
 </script>
 
 <?php require_once "../includes/footer.php"; ?>

@@ -613,17 +613,26 @@ require_once __DIR__ . "/../includes/header.php";
                     <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('product_images').click()">
                         <div class="upload-icon">🖼️</div>
                         <p class="upload-text"><strong>Click to upload</strong> or drag and drop</p>
-                        <p style="font-size: 0.85em; color: #999; margin: 5px 0 0 0;">JPG, PNG, GIF or WebP (max 5MB each)</p>
+                        <p style="font-size: 0.85em; color: #999; margin: 5px 0 0 0;">Select multiple images at once</p>
+                        <p style="font-size: 0.85em; color: #999; margin: 0;">JPG, PNG, GIF or WebP (max 5MB each)</p>
                     </div>
 
                     <input type="file" id="product_images" name="product_images[]" multiple accept="image/*" style="display: none;">
+
+                    <div id="selectedImagesInfo" style="display: none; text-align: center; margin: 10px 0; padding: 10px; background: #e7f3ff; border-radius: 4px; color: #0066cc; font-size: 0.9em;">
+                        <strong><span id="imageCount">0</span> image(s) selected</strong>
+                    </div>
 
                     <div class="image-preview-grid" id="imagePreviewGrid">
                         <!-- Image previews will appear here -->
                     </div>
 
+                    <button type="button" id="addMoreImagesBtn" class="btn btn-secondary" style="display: none; width: 100%; margin-top: 10px;" onclick="document.getElementById('product_images').click()">
+                        <i class="fas fa-plus"></i> Add More Images
+                    </button>
+
                     <p style="font-size: 0.85em; color: #666; margin-top: 10px; text-align: center;">
-                        You can add more images after creating the product
+                        You can select multiple images at once or add more after creating the product
                     </p>
                 </div>
             </div>
@@ -661,20 +670,47 @@ fileInput.addEventListener('change', handleImagePreview);
 
 function handleImagePreview() {
     previewGrid.innerHTML = '';
-    
+    const fileCount = fileInput.files.length;
+
+    // Update image count display
+    const imageCountSpan = document.getElementById('imageCount');
+    const selectedImagesInfo = document.getElementById('selectedImagesInfo');
+    const addMoreBtn = document.getElementById('addMoreImagesBtn');
+    const uploadAreaElement = document.getElementById('imageUploadArea');
+
+    if (fileCount > 0) {
+        imageCountSpan.textContent = fileCount;
+        selectedImagesInfo.style.display = 'block';
+        addMoreBtn.style.display = 'block';
+        uploadAreaElement.style.display = 'none';
+    } else {
+        selectedImagesInfo.style.display = 'none';
+        addMoreBtn.style.display = 'none';
+        uploadAreaElement.style.display = 'block';
+    }
+
     Array.from(fileInput.files).forEach((file, index) => {
+        // Validate file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            alert(`File "${file.name}" is too large. Maximum size is 5MB.`);
+            return;
+        }
+
         const reader = new FileReader();
-        
+
         reader.onload = (e) => {
             const preview = document.createElement('div');
             preview.className = 'image-preview-item';
             preview.innerHTML = `
                 <img src="${e.target.result}" alt="Product image ${index + 1}">
                 <button type="button" class="remove-btn" onclick="removeImagePreview(${index})" title="Remove">×</button>
+                <div style="position: absolute; bottom: 5px; left: 5px; background: rgba(0,0,0,0.7); color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.75em;">
+                    ${index + 1}
+                </div>
             `;
             previewGrid.appendChild(preview);
         };
-        
+
         reader.readAsDataURL(file);
     });
 }
