@@ -168,13 +168,7 @@ ini_set('display_errors', 1);
 
     <h2>Database Configuration</h2>
     <?php
-    function env($key, $default = null) {
-        if (array_key_exists($key, $_ENV)) {
-            return $_ENV[$key];
-        }
-        $value = getenv($key);
-        return $value !== false ? $value : $default;
-    }
+    // env() function is already defined in env_loader.php
     ?>
     <table>
         <tr>
