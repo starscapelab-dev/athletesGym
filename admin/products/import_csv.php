@@ -74,10 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                         // Extract and trim data
                         $code = !empty($row['CODE']) ? trim($row['CODE']) : null;
                         $productName = !empty($row['PRODUCT NAME']) ? trim($row['PRODUCT NAME']) : null;
+                        $description = isset($row['DESCRIPTION']) && !empty($row['DESCRIPTION']) ? trim($row['DESCRIPTION']) : '';
                         $size = !empty($row['SIZE']) ? trim($row['SIZE']) : null;
                         $quantity = isset($row['QUANTITY']) ? intval($row['QUANTITY']) : 0;
                         $unitCost = !empty($row['1 UNIT COST (QR)']) ? floatval($row['1 UNIT COST (QR)']) : 0;
                         $category = !empty($row['CATEGORY']) ? strtolower(trim($row['CATEGORY'])) : 'unisex';
+                        $featured = isset($row['FEATURED']) && strtoupper(trim($row['FEATURED'])) === 'YES' ? 1 : 0;
+                        $active = isset($row['ACTIVE']) && strtoupper(trim($row['ACTIVE'])) === 'NO' ? 0 : 1;
                         $photo = isset($row['PHOTO']) && !empty($row['PHOTO']) ? trim($row['PHOTO']) : '';
 
                         // Validate required fields
@@ -86,12 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                             continue;
                         }
 
-                        // Store product data
+                        // Store product data (only store once per product)
                         if (!isset($productsToProcess[$code])) {
                             $productsToProcess[$code] = [
                                 'name' => $productName,
+                                'description' => $description,
                                 'price' => $unitCost,
                                 'category' => $category,
+                                'featured' => $featured,
+                                'active' => $active,
                                 'images' => $photo,
                                 'variants' => []
                             ];
@@ -110,8 +116,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                     // Second pass: Process products
                     foreach ($productsToProcess as $code => $productData) {
                         $productName = $productData['name'];
+                        $description = $productData['description'];
                         $price = $productData['price'];
                         $gender = $productData['category'];
+                        $featured = $productData['featured'];
+                        $active = $productData['active'];
 
                         // Find or get default category (use first available)
                         $categoryStmt = $pdo->query("SELECT id FROM categories ORDER BY id LIMIT 1");
@@ -129,12 +138,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                             $updateStmt = $pdo->prepare("
                                 UPDATE products SET
                                     name = ?,
+                                    description = ?,
                                     price = ?,
                                     gender = ?,
-                                    category_id = ?
+                                    category_id = ?,
+                                    featured = ?,
+                                    active = ?
                                 WHERE id = ?
                             ");
-                            $updateStmt->execute([$productName, $price, $gender, $categoryId, $productId]);
+                            $updateStmt->execute([$productName, $description, $price, $gender, $categoryId, $featured, $active, $productId]);
 
                             // Delete existing variants
                             $deleteVariantsStmt = $pdo->prepare("DELETE FROM product_variants WHERE product_id = ?");
@@ -144,10 +156,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
                         } else {
                             // Insert new product
                             $insertStmt = $pdo->prepare("
-                                INSERT INTO products (id, name, price, gender, category_id, active, created_at)
-                                VALUES (?, ?, ?, ?, ?, 1, NOW())
+                                INSERT INTO products (id, name, description, price, gender, category_id, featured, active, created_at)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
                             ");
-                            $insertStmt->execute([$code, $productName, $price, $gender, $categoryId]);
+                            $insertStmt->execute([$code, $productName, $description, $price, $gender, $categoryId, $featured, $active]);
                             $productId = !empty($code) ? $code : $pdo->lastInsertId();
                             $importedCount++;
                         }
@@ -295,11 +307,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv_file'])) {
             <strong>📋 CSV Format Requirements:</strong>
             <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
                 <li><strong>Required columns:</strong> CODE, PRODUCT NAME, 1 UNIT COST (QR)</li>
-                <li><strong>Optional columns:</strong> SIZE, QUANTITY, CATEGORY, PHOTO</li>
+                <li><strong>Optional columns:</strong> DESCRIPTION, CATEGORY, SIZE, QUANTITY, FEATURED, ACTIVE, PHOTO</li>
                 <li><strong>Format:</strong> Each row represents one size variant of a product</li>
                 <li><strong>Example:</strong> Product "JACKET" with sizes XL, L, M, S = 4 rows with same CODE</li>
                 <li><strong>Category options:</strong> WOMENS, MENS, UNISEX, ACCESSORIES</li>
-                <li><strong>Product Images:</strong> Add image URLs in PHOTO column (only need on first variant row)</li>
+                <li><strong>Description, Featured, Active, Images:</strong> Add on first variant row only, leave empty on other rows</li>
+                <li><strong>Featured/Active:</strong> YES or NO (default: NO for Featured, YES for Active)</li>
+                <li><strong>Product Images:</strong> Add image URLs in PHOTO column (only on first variant row)</li>
                 <li><strong>Multiple Images:</strong> Separate URLs with pipe | symbol (e.g., url1.jpg|url2.jpg|url3.jpg)</li>
                 <li><strong>To update existing products:</strong> Use the same CODE as existing product</li>
             </ul>
