@@ -1,0 +1,121 @@
+================================================================================
+IMMEDIATE FIX FOR HOSTINGER DATABASE CONNECTION ERROR
+================================================================================
+
+ERROR YOU'RE SEEING:
+"Database connection failed: SQLSTATE[HY000] [1045] Access denied for user ''@'localhost' (using password: NO)"
+
+WHY IT'S HAPPENING:
+The .env.production file on Hostinger server has old/incorrect database credentials.
+
+UPDATED CREDENTIALS (from your message):
+DB_HOST=localhost
+DB_NAME=u794267186_athletesgym
+DB_USER=u794267186_gymuser
+DB_PASS=b2RN74^#Z
+
+================================================================================
+QUICK FIX - OPTION 1: Update via Hostinger File Manager
+================================================================================
+
+1. Login to Hostinger Control Panel
+   https://hpanel.hostinger.com/
+
+2. Go to: Files → File Manager
+
+3. Navigate to: public_html/
+
+4. Find and edit: .env.production
+
+5. Update these 4 lines:
+   DB_HOST=localhost
+   DB_NAME=u794267186_athletesgym
+   DB_USER=u794267186_gymuser
+   DB_PASS=b2RN74^#Z
+
+6. Save the file
+
+7. Test: Visit https://athletesgym.qa/
+   (Should work immediately)
+
+================================================================================
+QUICK FIX - OPTION 2: Upload the Updated File
+================================================================================
+
+1. The .env.production file in your LOCAL project has been updated with
+   the correct credentials
+
+2. Upload it to Hostinger:
+   - Via FTP client (FileZilla)
+   - Or via Hostinger File Manager
+
+3. Location: /home/u794267186/public_html/.env.production
+
+4. Set permissions: 600 (read/write owner only)
+
+5. Test: https://athletesgym.qa/
+
+================================================================================
+VERIFY THE FIX
+================================================================================
+
+1. Upload debug_env.php to Hostinger (from your project root)
+
+2. Visit: https://athletesgym.qa/debug_env.php
+
+3. Check:
+   ✓ Expected .env file: .env.production
+   ✓ File exists: YES
+   ✓ DB_HOST: localhost
+   ✓ DB_NAME: u794267186_athletesgym
+   ✓ DB_USER: u794267186_gymuser
+   ✓ DB_PASS: ***SET***
+   ✓ DATABASE CONNECTION SUCCESSFUL!
+
+4. DELETE debug_env.php after verification (security!)
+
+================================================================================
+IF STILL NOT WORKING
+================================================================================
+
+Check these:
+
+1. File exists and is named correctly:
+   - Must be: .env.production (with dot at start)
+   - NOT: env.production or .env_production
+
+2. File permissions:
+   chmod 600 .env.production
+
+3. No extra spaces in credentials (copy exactly as shown above)
+
+4. Database user has access permissions:
+   - Login to Hostinger phpMyAdmin
+   - Check database: u794267186_athletesgym exists
+   - Check user: u794267186_gymuser has access
+
+5. Check error logs:
+   - Hostinger Control Panel → Advanced → Error Logs
+
+================================================================================
+FILES INCLUDED
+================================================================================
+
+✓ DEPLOYMENT_GUIDE_HOSTINGER.md - Detailed deployment guide
+✓ debug_env.php - Upload this to diagnose issues
+✓ .env.production - Updated with new credentials (DO NOT COMMIT TO GIT)
+
+================================================================================
+SUMMARY
+================================================================================
+
+The database credentials have been updated locally in .env.production.
+You just need to upload this file to Hostinger at:
+/home/u794267186/public_html/.env.production
+
+Old credentials: u675015292_*
+New credentials: u794267186_*
+
+The system will auto-detect athletesgym.qa domain and load .env.production.
+
+================================================================================
