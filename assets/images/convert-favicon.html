@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Favicon Converter</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        canvas { border: 1px solid #ccc; }
+        button { margin: 10px 0; padding: 10px 20px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h2>Favicon PNG Generator</h2>
+    <p>This will generate favicon.png with black circular background</p>
+    <canvas id="canvas" width="64" height="64"></canvas>
+    <br>
+    <button onclick="downloadImage()">Download favicon.png</button>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Draw black circle
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(32, 32, 32, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Draw white "G" letter (simplified)
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 40px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('G', 32, 32);
+
+        function downloadImage() {
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'favicon.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert('favicon.png downloaded! Replace the old favicon.png with this file.');
+            });
+        }
+    </script>
+</body>
+</html>
