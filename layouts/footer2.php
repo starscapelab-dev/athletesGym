@@ -54,12 +54,12 @@
                 <table class="table text-left text-white">
                     <tbody class="fw-normal">
                         <tr>
-                            <td>Sat - Thu</td>
-                            <td>8:00am - 5:00pm</td>
+                            <td>Sat - Thu:</td>
+                            <td>7:00am - 10:00pm</td>
                         </tr>
                         <tr>
-                            <td>Friday</td>
-                            <td>Closed</td>
+                            <td>Friday:</td>
+                            <td>1:00pm - 10:00pm</td>
                         </tr>
                         <tr>
                             <td>Holidays:</td>
