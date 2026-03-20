@@ -107,11 +107,19 @@ body > video {
     display: block;
     position: relative;
     z-index: 1;
+    width: 100%;
 }
 
 @media (max-width: 1199px) {
+    /* Add padding to body to prevent video from going behind fixed header */
+    body {
+        padding-top: 70px;
+    }
+
     body > video {
-        margin-top: 70px;
+        margin-top: 0;
+        position: relative;
+        top: 0;
     }
 }
 
