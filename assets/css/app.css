@@ -102,6 +102,19 @@ img {
     max-width: 100%;
 }
 
+/* Video positioning for mobile devices */
+body > video {
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 1199px) {
+    body > video {
+        margin-top: 80px;
+    }
+}
+
 ul {
     list-style-type: none;
     padding-left: 0;
