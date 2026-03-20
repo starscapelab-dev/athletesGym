@@ -25,7 +25,7 @@
                 <h5 class="text-uppercase mb-4 pb-1">Contact Us</h5>
                 <ul class="contact-list" style="list-style: none; padding: 0; margin: 0;">
                     <li class="mb-3" style="display: flex; align-items: flex-start; gap: 12px;">
-                        <i class="fas fa-home" style="font-size: 16px; margin-top: 3px; min-width: 20px;"></i>
+                        <i class="fas fa-home" style="font-size: 16px; margin-top: 3px; min-width: 20px; text-align:center"></i>
                         <span>G-27, Mamsha Bay, Lusail Marina 12-D, Doha, Qatar.</span>
                     </li>
                     <li class="mb-3" style="display: flex; align-items: flex-start; gap: 12px;">

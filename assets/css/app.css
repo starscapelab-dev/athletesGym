@@ -6074,6 +6074,16 @@ iframe .ytp-watermark {
         margin-right: 0;
     }
 }
+
+/* Footer contact list text alignment on mobile */
+@media (max-width: 991px) {
+    footer .contact-list li {
+        text-align: left;
+    }
+    footer .contact-list li span {
+        text-align: left;
+    }
+}
 .rating-stars {
   display: flex;
   flex-direction: row-reverse; /* ← THIS FIXES THE REVERSE ISSUE */
