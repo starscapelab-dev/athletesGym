@@ -3,17 +3,56 @@
 require_once __DIR__ . "/includes/session.php";
 require_once __DIR__ . "/layouts/header-item.php";
 require_once __DIR__ . "/admin/includes/db.php";
-require_once __DIR__ . "/includes/cart_functions.php";
 require_once __DIR__ . "/layouts/config.php";
 require_once __DIR__ . "/includes/csrf.php";
 
-// ✅ REQUIRE LOGIN - No guest checkout allowed
-if (empty($_SESSION['user_id'])) {
-    header("Location: " . BASE_URL . "auth/login.php?redirect=checkout");
-    exit;
+// Remove require_auth to allow guest checkout
+// Manually get cart ID for guests
+function getGuestCartId($pdo) {
+    if (isset($_SESSION['user_id'])) {
+        // Logged-in user
+        $stmt = $pdo->prepare("SELECT id FROM carts WHERE user_id=? and status = 'active' LIMIT 1");
+        $stmt->execute([$_SESSION['user_id']]);
+        $cart = $stmt->fetchColumn();
+        if (!$cart) {
+            $pdo->prepare("INSERT INTO carts (user_id, status) VALUES (?, 'active')")->execute([$_SESSION['user_id']]);
+            return $pdo->lastInsertId();
+        }
+        return $cart;
+    } else {
+        // Guest user (session-based)
+        if (!isset($_SESSION['cart_session_id'])) {
+            $_SESSION['cart_session_id'] = session_id();
+            $pdo->prepare("INSERT INTO carts (session_id, status) VALUES (?, 'active')")->execute([$_SESSION['cart_session_id']]);
+        }
+        $stmt = $pdo->prepare("SELECT id FROM carts WHERE session_id=? and status = 'active' LIMIT 1");
+        $stmt->execute([$_SESSION['cart_session_id']]);
+        return $stmt->fetchColumn();
+    }
 }
 
-$items = getCartItems($pdo);
+function getGuestCartItems($pdo) {
+    $cartId = getGuestCartId($pdo);
+    if (!$cartId) return [];
+    $stmt = $pdo->prepare("SELECT ci.id as cart_item_id, ci.quantity, p.name, p.price, siz.name as size, col.name as color, (
+    SELECT image_path
+    FROM product_images
+    WHERE product_id = p.id
+    ORDER BY id ASC
+    LIMIT 1
+  ) AS image_path, ci.variant_id
+                           FROM cart_items ci
+                           JOIN products p ON ci.product_id=p.id
+                           LEFT JOIN product_variants v ON ci.variant_id=v.id
+                           LEFT JOIN sizes siz ON siz.id=v.size_id
+                           LEFT JOIN colors col ON col.id=v.color_id
+                           WHERE ci.cart_id=? and ci.is_removed = 0
+                           ");
+    $stmt->execute([$cartId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+$items = getGuestCartItems($pdo);
 if (!$items) {
     echo "<p>Your cart is empty. <a href='shop.php'>Go to shop</a></p>";
     require_once __DIR__ . "/layouts/footer.php"; exit;

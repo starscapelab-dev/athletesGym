@@ -10,7 +10,7 @@ require_once __DIR__ . "/../admin/includes/db.php";
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-require_auth();
+// Guest checkout enabled - remove require_auth()
 // Ensure a cart exists
 function getCartId($pdo) {
     if (isset($_SESSION['user_id'])) {
