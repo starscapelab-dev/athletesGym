@@ -138,7 +138,7 @@ $items = getGuestCartItems($pdo);
 
           <div class="cart-buttons">
             <a href="<?= BASE_URL ?>shop.php" class="btn-secondary">Continue Shopping</a>
-            <a href="<?= BASE_URL ?>checkout.php" class="btn-primary">Proceed to Checkout</a>
+            <a href="<?= BASE_URL ?>checkout-gateway.php" class="btn-primary">Proceed to Checkout</a>
           </div>
         </div>
       </div>

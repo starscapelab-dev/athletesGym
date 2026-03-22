@@ -6,6 +6,12 @@ require_once __DIR__ . "/admin/includes/db.php";
 require_once __DIR__ . "/layouts/config.php";
 require_once __DIR__ . "/includes/csrf.php";
 
+// Redirect to checkout gateway if not logged in and not coming from guest checkout
+if (!isset($_SESSION['user_id']) && !isset($_SESSION['guest'])) {
+    header("Location: checkout-gateway.php");
+    exit;
+}
+
 // Remove require_auth to allow guest checkout
 // Manually get cart ID for guests
 function getGuestCartId($pdo) {
