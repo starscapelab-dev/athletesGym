@@ -84,18 +84,13 @@ p {
 
 /* Keep headings and navigation with Orbitron */
 h1,
+h2,
 h3,
 h4,
 h5,
 h6,
 .navbar-nav .nav-link {
     font-family: "Orbitron-VariableFont_wght";
-}
-
-/* Use Inter font for h2 for better readability */
-h2 {
-    font-family: "Inter", sans-serif;
-    font-weight: 600;
 }
 
 a {
