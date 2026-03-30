@@ -55,7 +55,7 @@
                     <tbody class="fw-normal">
                         <tr>
                             <td>Sat - Thu:</td>
-                            <td>7:00am - 10:00pm</td>
+                            <td>6:00am - 10:00pm</td>
                         </tr>
                         <tr>
                             <td>Friday:</td>
