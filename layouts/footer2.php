@@ -49,7 +49,7 @@
                 }
             </style>
             <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
-                <h5 class="text-uppercase mb-4">Viewing hours</h5>
+                <h5 class="text-uppercase mb-4">Working hours</h5>
 
                 <table class="table text-left text-white">
                     <tbody class="fw-normal">
