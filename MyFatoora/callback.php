@@ -188,7 +188,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     'customer_name' => $order['full_name'],
                     'customer_email' => $order['email'],
                     'customer_phone' => $order['phone'] ?? '',
-                    'shipping_address' => $order['address'] ?? '',
+                    'shipping_address' => $order['shipping_address'] ?? $order['address'] ?? '',
+                    'billing_address' => $order['shipping_address'] ?? $order['address'] ?? '',
                     'order_date' => $order['created_at'],
                     'total' => $order['total'],
                     'subtotal' => $order['subtotal'] ?? 0,
@@ -202,6 +203,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                             'name' => $item['product_name'],
                             'quantity' => $item['quantity'],
                             'price' => $item['price'],
+                            'size' => $item['size'] ?? '',
+                            'color' => $item['color'] ?? '',
                             'images' => $item['images'] ?? []
                         ];
                     }, $items)
