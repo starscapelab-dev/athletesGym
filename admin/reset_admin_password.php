@@ -21,22 +21,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($newPassword) < 6) {
         $message = 'Password must be at least 6 characters';
     } else {
-        // Hash the new password
-        $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+        try {
+            // First check if username exists
+            $checkStmt = $pdo->prepare("SELECT id, username FROM admins WHERE username = ?");
+            $checkStmt->execute([$username]);
+            $admin = $checkStmt->fetch();
 
-        // Update admin password
-        $stmt = $pdo->prepare("UPDATE admins SET password = ? WHERE username = ?");
-        $result = $stmt->execute([$hashedPassword, $username]);
+            if (!$admin) {
+                $message = "❌ Username '{$username}' not found in database.<br><br>Please check the username or create an admin account first.";
+            } else {
+                // Hash the new password
+                $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
 
-        if ($result) {
-            $success = true;
-            $message = "✅ Password updated successfully!<br><br>
-                       <strong>Username:</strong> {$username}<br>
-                       <strong>New Password:</strong> {$newPassword}<br><br>
-                       <a href='login.php' style='color: #21335b; font-weight: bold;'>Go to Login Page</a><br><br>
-                       <strong style='color: red;'>⚠️ DELETE THIS FILE NOW: admin/reset_admin_password.php</strong>";
-        } else {
-            $message = 'Failed to update password. Check if username exists.';
+                // Update admin password
+                $stmt = $pdo->prepare("UPDATE admins SET password = ? WHERE username = ?");
+                $result = $stmt->execute([$hashedPassword, $username]);
+
+                if ($result && $stmt->rowCount() > 0) {
+                    $success = true;
+                    $message = "✅ Password updated successfully!<br><br>
+                               <strong>Username:</strong> {$username}<br>
+                               <strong>New Password:</strong> {$newPassword}<br><br>
+                               <a href='login.php' style='color: #21335b; font-weight: bold;'>Go to Login Page</a><br><br>
+                               <strong style='color: red;'>⚠️ DELETE THIS FILE NOW: admin/reset_admin_password.php</strong>";
+                } else {
+                    $message = '❌ Failed to update password. No rows were affected.';
+                }
+            }
+        } catch (PDOException $e) {
+            $message = "❌ Database Error: " . $e->getMessage();
         }
     }
 }
