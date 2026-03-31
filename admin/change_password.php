@@ -7,6 +7,12 @@ require_once __DIR__ . "/includes/header.php"; // Header includes _session.php f
 $success = '';
 $error = '';
 
+// Check for success message from redirect
+if (isset($_SESSION['password_change_success'])) {
+    $success = $_SESSION['password_change_success'];
+    unset($_SESSION['password_change_success']);
+}
+
 // Process password change form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verify CSRF token
@@ -41,9 +47,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE admins SET password = ? WHERE id = ?");
 
                 if ($stmt->execute([$new_password_hash, $_SESSION['admin_id']])) {
-                    $success = 'Password changed successfully!';
-                    // Clear form fields on success
-                    $_POST = [];
+                    // Use session to store success message and redirect (POST/Redirect/GET pattern)
+                    $_SESSION['password_change_success'] = 'Password changed successfully!';
+                    header("Location: change_password.php");
+                    exit;
                 } else {
                     $error = 'Failed to update password. Please try again.';
                 }
