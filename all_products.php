@@ -29,8 +29,8 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
                 <?php
                     // Fetch all products for this category
                     $products = $pdo->prepare("
-                        SELECT p.*, (SELECT image_path FROM product_images WHERE product_id=p.id LIMIT 1) AS main_image
-                        FROM products p  
+                        SELECT p.*, (SELECT image_path FROM product_images WHERE product_id=p.id ORDER BY is_featured DESC, id ASC LIMIT 1) AS main_image
+                        FROM products p
                         WHERE category_id=? AND active='1'
                         ORDER BY p.id DESC
                     ");

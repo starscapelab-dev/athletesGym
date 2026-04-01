@@ -11,7 +11,7 @@ require_once __DIR__ . "/../includes/header.php";
 $stmt = $pdo->query("SELECT p.*, c.name AS category_name,
                      (SELECT pi.image_path FROM product_images pi
                       WHERE pi.product_id = p.id
-                      ORDER BY pi.id ASC LIMIT 1) as thumbnail
+                      ORDER BY pi.is_featured DESC, pi.id ASC LIMIT 1) as thumbnail
                      FROM products p
                      LEFT JOIN categories c ON p.category_id=c.id
                      ORDER BY p.created_at DESC");

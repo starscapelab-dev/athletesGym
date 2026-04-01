@@ -12,9 +12,9 @@ require_auth();
 $id = isset($_GET['category']) ? intval($_GET['category']) : 0;
 
 $products = $pdo->prepare("
-    SELECT p.*, (SELECT image_path FROM product_images WHERE product_id=p.id LIMIT 1) AS main_image
-    FROM products p  
-    WHERE category_id=? 
+    SELECT p.*, (SELECT image_path FROM product_images WHERE product_id=p.id ORDER BY is_featured DESC, id ASC LIMIT 1) AS main_image
+    FROM products p
+    WHERE category_id=?
     ORDER BY p.id DESC
 ");
 $products->execute([$id]);

@@ -1939,6 +1939,44 @@ h1, h2, h3, h4, h5, h6, .btn {
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
+/* Featured Image Styling */
+.image-card.featured-image {
+  border: 3px solid #fbbf24;
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
+}
+
+.featured-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+  z-index: 10;
+}
+
+.btn-featured {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.btn-featured:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+}
+
 /* Upload Form */
 .upload-form, .variant-form {
   background: #f8f9fa;

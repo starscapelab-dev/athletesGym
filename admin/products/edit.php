@@ -17,8 +17,8 @@ if (!$product) {
     redirect("list.php?msg=Product+not+found");
 }
 
-// Get product images
-$imagesStmt = $pdo->prepare("SELECT * FROM product_images WHERE product_id = ? ORDER BY id");
+// Get product images (featured first)
+$imagesStmt = $pdo->prepare("SELECT * FROM product_images WHERE product_id = ? ORDER BY is_featured DESC, id ASC");
 $imagesStmt->execute([$id]);
 $images = $imagesStmt->fetchAll();
 
@@ -164,6 +164,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $imagesStmt->execute([$id]);
             $images = $imagesStmt->fetchAll();
         }
+    }
+
+    // Set featured image
+    elseif ($action === 'set_featured') {
+        $image_id = (int)$_POST['image_id'];
+
+        // First, unset all featured images for this product
+        $pdo->prepare("UPDATE product_images SET is_featured = 0 WHERE product_id = ?")->execute([$id]);
+
+        // Then set the selected image as featured
+        $pdo->prepare("UPDATE product_images SET is_featured = 1 WHERE id = ? AND product_id = ?")->execute([$image_id, $id]);
+
+        $success = "Featured image updated successfully!";
+
+        // Refresh images
+        $imagesStmt->execute([$id]);
+        $images = $imagesStmt->fetchAll();
     }
 
     // Add variant
@@ -409,9 +426,20 @@ require_once __DIR__ . "/../includes/header.php";
     <?php else: ?>
         <div class="images-grid">
             <?php foreach ($images as $img): ?>
-                <div class="image-card">
+                <div class="image-card <?= !empty($img['is_featured']) ? 'featured-image' : '' ?>">
+                    <?php if (!empty($img['is_featured'])): ?>
+                        <div class="featured-badge">★ Featured</div>
+                    <?php endif; ?>
                     <img src="<?= BASE_URL ?>uploads/<?= $img['image_path'] ?>" alt="<?= sanitize($img['alt_text']) ?>" onerror="this.src='<?= BASE_URL ?>assets/images/placeholder.png'">
                     <div class="image-actions">
+                        <?php if (empty($img['is_featured'])): ?>
+                            <form method="POST" style="display: inline;" onsubmit="return confirm('Set this as the featured/thumbnail image?')">
+                                <?php csrfField(); ?>
+                                <input type="hidden" name="action" value="set_featured">
+                                <input type="hidden" name="image_id" value="<?= $img['id'] ?>">
+                                <button type="submit" class="btn-action btn-featured" title="Set as Featured">⭐</button>
+                            </form>
+                        <?php endif; ?>
                         <form method="POST" style="display: inline;" onsubmit="return confirm('Delete this image?')">
                             <?php csrfField(); ?>
                             <input type="hidden" name="action" value="delete_image">

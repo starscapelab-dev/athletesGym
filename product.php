@@ -17,8 +17,8 @@ if (!$product) {
     exit;
 }
 
-// Images (all)
-$images = $pdo->prepare("SELECT image_path FROM product_images WHERE product_id=?");
+// Images (all) - Featured image first
+$images = $pdo->prepare("SELECT image_path FROM product_images WHERE product_id=? ORDER BY is_featured DESC, id ASC");
 $images->execute([$id]);
 $images = $images->fetchAll(PDO::FETCH_COLUMN);
 

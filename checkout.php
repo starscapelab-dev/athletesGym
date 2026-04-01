@@ -44,7 +44,7 @@ function getGuestCartItems($pdo) {
     SELECT image_path
     FROM product_images
     WHERE product_id = p.id
-    ORDER BY id ASC
+    ORDER BY is_featured DESC, id ASC
     LIMIT 1
   ) AS image_path, ci.variant_id
                            FROM cart_items ci

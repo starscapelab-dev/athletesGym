@@ -60,7 +60,7 @@ function getGuestCartItems($pdo) {
     $cartId = getGuestCartId($pdo);
     if (!$cartId) return [];
     $stmt = $pdo->prepare("SELECT ci.id as cart_item_id, ci.quantity, p.name, p.price, siz.name as size, col.name as color, (
-    SELECT image_path FROM product_images WHERE product_id = p.id ORDER BY id ASC LIMIT 1
+    SELECT image_path FROM product_images WHERE product_id = p.id ORDER BY is_featured DESC, id ASC LIMIT 1
   ) AS image_path, ci.variant_id
                            FROM cart_items ci
                            JOIN products p ON ci.product_id=p.id
