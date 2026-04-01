@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Start output buffering to prevent header issues
 $pageTitle = "Change Password";
 require_once __DIR__ . "/includes/db.php";
 require_once __DIR__ . "/includes/functions.php";
@@ -49,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($stmt->execute([$new_password_hash, $_SESSION['admin_id']])) {
                     // Use session to store success message and redirect (POST/Redirect/GET pattern)
                     $_SESSION['password_change_success'] = 'Password changed successfully!';
+                    ob_end_clean(); // Clear output buffer before redirect
                     header("Location: change_password.php");
                     exit;
                 } else {
