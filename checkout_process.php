@@ -236,7 +236,10 @@ try {
     // Format phone for MyFatoorah - extract numeric country code and phone
     $countryCodeNumeric = preg_replace('/[^0-9]/', '', $country_code); // Extract digits from +971
     $phoneNumeric = preg_replace('/[^0-9]/', '', $phone); // Extract digits from phone
-    $formattedPhone = $countryCodeNumeric . $phoneNumeric; // Combine them
+
+    // MyFatoorah requires CustomerMobile to be max 11 characters (phone number only, without country code)
+    // The country code is passed separately in MobileCountryCode field
+    $phoneNumeric = substr($phoneNumeric, 0, 11); // Limit to 11 characters
 
     $postFields      = [
         'InvoiceValue' => $total,
@@ -248,7 +251,7 @@ try {
         "InvoiceItems" => $invoiceItems,
         "CustomerReference"  => $orderId,
         'CustomerName' => $name,
-        'CustomerMobile' => $formattedPhone,
+        'CustomerMobile' => $phoneNumeric,
         'CustomerEmail' => $email,
         'CallBackUrl'  => $baseCallbackUrl . '/MyFatoora/callback.php',
         'ErrorUrl'     => $baseCallbackUrl . '/MyFatoora/callback.php',
@@ -265,7 +268,8 @@ try {
     error_log("Customer Name: " . $name);
     error_log("Customer Email: " . $email);
     error_log("Customer Phone (original): " . $full_phone);
-    error_log("Customer Phone (formatted): " . $formattedPhone);
+    error_log("Mobile Country Code: " . $countryCodeNumeric);
+    error_log("Customer Mobile (phone only): " . $phoneNumeric);
     error_log("Invoice Items Count: " . count($invoiceItems));
     error_log("Callback URL: " . $baseCallbackUrl . '/MyFatoora/callback.php');
     error_log("Test Mode: " . ($isTestMode ? 'true' : 'false'));

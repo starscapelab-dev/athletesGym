@@ -61,10 +61,6 @@
                             <td>Friday:</td>
                             <td>1:00pm - 10:00pm</td>
                         </tr>
-                        <tr>
-                            <td>Holidays:</td>
-                            <td>Closed</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
