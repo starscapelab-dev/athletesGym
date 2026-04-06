@@ -226,9 +226,8 @@ $phone = $_SESSION['user_phone'] ?? "";
             <span>Subtotal</span>
             <span><?= number_format($grand, 2) ?> QR</span>
           </div>
-          <div class="line">
-            <span>Shipping</span>
-            <span>Free</span>
+          <div class="line delivery-note">
+            <span style="font-size: 0.9em; color: #666;">Delivery charges will be borne by the customer.</span>
           </div>
           <div class="line total">
             <span>Total</span>
