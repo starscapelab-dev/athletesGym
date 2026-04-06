@@ -180,42 +180,6 @@ foreach ($variants as $v) {
   ?>
 </div>
 
-<?php 
-// Fetch suggested products (same category or gender)
-$suggestionsStmt = $pdo->prepare("
-  SELECT a1.id, a1.name, a1.price, a2.image_path
-  FROM products a1 left join product_images a2 on a1.id = a2.product_id
-  WHERE a1.id != ? AND (a1.category_id = ? OR a1.gender = ?)
-  ORDER BY RAND()
-  LIMIT 4
-");
-
-$suggestionsStmt->execute([$product['id'], $product['category_id'], $product['gender']]);
-$suggestions = $suggestionsStmt->fetchAll();
-
-if ($suggestions): ?>
-<section class="related-products">
-  <div class="container">
-    <h3 class="related-title">You May Also Like</h3>
-    <div class="related-grid">
-      <?php foreach ($suggestions as $s): ?>
-        <div class="related-card">
-          <a href="product.php?id=<?= $s['id'] ?>" style="color: #000000;">
-            <div class="related-thumb">
-              <img src="<?= BASE_URL ?>uploads/<?= $s['image_path'] ?>" alt="<?= $s['image_path'] ?>">
-            </div>
-            <div class="related-info">
-              <h4><?= $s['name'] ?></h4>
-              <p class="price">QAR <?= number_format($s['price'], 2) ?></p>
-            </div>
-          </a>
-          <button class="add-to-cart-btn small" data-id="<?= $s['id'] ?>">Add to Cart</button>
-        </div>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</section>
-<?php 
-endif; 
+ 
 
 require_once "layouts/footer2.php"; ?>
