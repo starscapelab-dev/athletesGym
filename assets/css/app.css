@@ -6014,12 +6014,14 @@ iframe .ytp-watermark {
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     transition: all 0.3s ease;
     text-decoration: none;
-    color: inherit;
+    color: #000 !important;
+    display: block;
   }
-  
+
   .related-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    color: #000 !important;
   }
   
   .related-thumb img {
