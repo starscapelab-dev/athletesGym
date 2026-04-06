@@ -6013,6 +6013,8 @@ iframe .ytp-watermark {
     text-align: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
   }
   
   .related-card:hover {
@@ -6035,6 +6037,7 @@ iframe .ytp-watermark {
     font-size: 1.1rem;
     font-weight: 500;
     margin: 10px 0 5px;
+    color: #000;
   }
   
   .related-info .price {
