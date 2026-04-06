@@ -6039,7 +6039,7 @@ iframe .ytp-watermark {
     font-size: 1.1rem;
     font-weight: 600;
     margin: 10px 0 5px;
-    color: #000;
+    color: #000 !important;
     text-decoration: none;
   }
   
