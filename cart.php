@@ -127,9 +127,8 @@ $items = getGuestCartItems($pdo);
             <span>Subtotal</span>
             <span><?= number_format($grandTotal, 2) ?> QR</span>
           </div>
-          <div class="summary-line">
-            <span>Shipping</span>
-            <span>Free</span>
+          <div class="summary-line" style="color: #666; font-size: 0.9em;">
+            <span>Delivery charges will be borne by the customer.</span>
           </div>
           <div class="summary-total">
             <span>Total</span>
