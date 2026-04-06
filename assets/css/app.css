@@ -6035,16 +6035,16 @@ iframe .ytp-watermark {
     padding: 15px;
   }
   
-  .related-info h4 {
+  .related-card h4 {
     font-size: 1.1rem;
     font-weight: 600;
     margin: 10px 0 5px;
     color: #000 !important;
     text-decoration: none;
   }
-  
+
   .related-info .price {
-    color: #888;
+    color: #888 !important;
     font-size: 0.95rem;
   }
   
