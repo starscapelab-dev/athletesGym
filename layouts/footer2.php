@@ -54,12 +54,12 @@
                 <table class="table text-left text-white">
                     <tbody class="fw-normal">
                         <tr>
-                            <td>Saturday - Thursday:</td>
+                            <td style="padding-right: 20px;">Saturday - Thursday:</td>
                             <td>6:00 am to 12:00 am</td>
                         </tr>
                         <tr>
-                            <td>Friday:</td>
-                            <td>6:00 am to 11:00 pm - 1:00 pm to 12:00 am</td>
+                            <td style="padding-right: 20px; vertical-align: top;">Friday:</td>
+                            <td>6:00 am to 11:00 am<br>1:00 pm to 12:00 am</td>
                         </tr>
                     </tbody>
                 </table>
