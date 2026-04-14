@@ -55,11 +55,11 @@
                     <tbody class="fw-normal">
                         <tr>
                             <td>Sat - Thu:</td>
-                            <td>6:00am - 10:00pm</td>
+                            <td>6:00am - 12:00am</td>
                         </tr>
                         <tr>
                             <td>Friday:</td>
-                            <td>1:00pm - 10:00pm</td>
+                            <td>6:00am - 11:00am<br>1:00pm - 12:00am</td>
                         </tr>
                     </tbody>
                 </table>
