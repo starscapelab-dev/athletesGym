@@ -22,11 +22,11 @@ $orderStats = $pdo->query("SELECT
     COUNT(CASE WHEN order_status = 'cancelled' THEN 1 END) as cancelled_orders
     FROM orders")->fetch();
 
-// Sales Statistics
+// Sales Statistics - Only count paid orders
 $salesStats = $pdo->query("SELECT
-    SUM(total) as total_revenue,
-    SUM(CASE WHEN order_status = 'completed' THEN total ELSE 0 END) as completed_revenue,
-    AVG(total) as avg_order_value
+    SUM(CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) as total_revenue,
+    SUM(CASE WHEN order_status = 'completed' AND payment_status = 'paid' THEN total ELSE 0 END) as completed_revenue,
+    AVG(CASE WHEN payment_status = 'paid' THEN total END) as avg_order_value
     FROM orders")->fetch();
 
 // Review Statistics
@@ -44,24 +44,21 @@ $lowStockCount = $pdo->query("SELECT COUNT(DISTINCT pv.product_id)
 
 // Recent activity - Last 30 days
 $recentStats = $pdo->query("SELECT
-    COUNT(CASE WHEN o.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END) as orders_last_30_days,
-    COUNT(CASE WHEN u.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END) as users_last_30_days,
-    COUNT(CASE WHEN r.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END) as reviews_last_30_days
-    FROM orders o
-    CROSS JOIN users u
-    CROSS JOIN product_reviews r")->fetch();
+    (SELECT COUNT(*) FROM orders WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as orders_last_30_days,
+    (SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as users_last_30_days,
+    (SELECT COUNT(*) FROM product_reviews WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as reviews_last_30_days")->fetch();
 
-// Today's statistics
+// Today's statistics - Only count paid orders for revenue
 $todayStats = $pdo->query("SELECT
     COUNT(CASE WHEN DATE(o.created_at) = CURDATE() THEN 1 END) as orders_today,
-    SUM(CASE WHEN DATE(o.created_at) = CURDATE() THEN o.total ELSE 0 END) as revenue_today
+    SUM(CASE WHEN DATE(o.created_at) = CURDATE() AND o.payment_status = 'paid' THEN o.total ELSE 0 END) as revenue_today
     FROM orders o")->fetch();
 
-// Last 7 days sales data for chart
+// Last 7 days sales data for chart - Only count paid orders for revenue
 $last7Days = $pdo->query("SELECT
     DATE(created_at) as date,
     COUNT(*) as orders,
-    SUM(total) as revenue
+    SUM(CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) as revenue
     FROM orders
     WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
     GROUP BY DATE(created_at)
