@@ -24,24 +24,30 @@ $images = $images->fetchAll(PDO::FETCH_COLUMN);
 
 // Variants
 $variantsStmt = $pdo->prepare("
-    SELECT v.id, c.name AS color, s.name AS size, v.stock
+    SELECT v.id, c.name AS color, s.name AS size, v.stock, s.sort_order
     FROM product_variants v
     JOIN colors c ON v.color_id = c.id
     JOIN sizes s ON v.size_id = s.id
     WHERE v.product_id = ?
-    ORDER BY c.name, s.name
+    ORDER BY c.name, s.sort_order, s.name
 ");
 $variantsStmt->execute([$id]);
 $variants = $variantsStmt->fetchAll(PDO::FETCH_ASSOC);
-// Group variants
+// Group variants while preserving sort order
 $colors = [];
 $sizes = [];
 $variantMap = [];
 foreach ($variants as $v) {
     $colors[$v['color']] = true;
-    $sizes[$v['size']] = true;
+    // Store size with its sort_order to maintain proper ordering
+    if (!isset($sizes[$v['size']])) {
+        $sizes[$v['size']] = $v['sort_order'];
+    }
     $variantMap[$v['color']][$v['size']] = $v['stock'];
 }
+// Sort sizes by their sort_order value
+asort($sizes);
+$sizes = array_keys($sizes);
 ?>
 
 <script>
@@ -95,7 +101,7 @@ foreach ($variants as $v) {
                 <?php if ($sizes): ?>
                     <div style="margin-top: 15px;"><strong>Size:</strong></div>
                     <div class="size-list">
-                        <?php foreach (array_keys($sizes) as $i => $size): ?>
+                        <?php foreach ($sizes as $i => $size): ?>
                             <button type="button" class="size-btn <?=($i==0?'selected':'')?>" data-size="<?=htmlspecialchars($size)?>"><?=htmlspecialchars($size)?></button>
                         <?php endforeach; ?>
                     </div>

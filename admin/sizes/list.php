@@ -8,8 +8,8 @@ require_once __DIR__ . "/../includes/functions.php";
 require_once __DIR__ . '/../../includes/csrf.php';
 require_once __DIR__ . "/../includes/header.php";
 
-// Fetch sizes
-$stmt = $pdo->query("SELECT * FROM sizes ORDER BY id DESC");
+// Fetch sizes - ordered by sort_order for proper display (S, M, L, XL, XXL)
+$stmt = $pdo->query("SELECT * FROM sizes ORDER BY sort_order, name");
 $sizes = $stmt->fetchAll();
 ?>
 
@@ -27,6 +27,7 @@ $sizes = $stmt->fetchAll();
     <tr>
       <th width="60">ID</th>
       <th>Name</th>
+      <th width="120">Display Order</th>
       <th width="160">Actions</th>
     </tr>
   </thead>
@@ -35,6 +36,7 @@ $sizes = $stmt->fetchAll();
       <tr>
         <td><?= $size['id'] ?></td>
         <td><?= sanitize($size['name']) ?></td>
+        <td><?= $size['sort_order'] ?></td>
         <td>
           <div class="actions">
             <a href="edit.php?id=<?= $size['id'] ?>" class="btn btn-edit">Edit</a>
