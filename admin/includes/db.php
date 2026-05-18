@@ -1,4 +1,3 @@
-
 <?php
 // Load environment variables
 require_once __DIR__ . '/../../includes/env_loader.php';
