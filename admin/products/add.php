@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $upload_path = $upload_dir . $new_filename;
                             
                             if (move_uploaded_file($_FILES['product_images']['tmp_name'][$i], $upload_path)) {
-                                $alt_text = trim($_POST['image_alt'][$i] ?? $name);
+                                $alt_text = trim($_POST['image_alt'][$i] ?? $form_data['name']);
                                 $imageStmt->execute([$product_id, $new_filename, $alt_text]);
                             }
                         }
