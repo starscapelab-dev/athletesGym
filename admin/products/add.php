@@ -115,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $cats = $pdo->query("SELECT id, name FROM categories ORDER BY name")->fetchAll();
-$sizes = $pdo->query("SELECT id, name FROM sizes ORDER BY sort_order, name")->fetchAll();
+$sizes = $pdo->query("SELECT id, name FROM sizes ORDER BY name")->fetchAll();
 $colors = $pdo->query("SELECT id, name, hex_code FROM colors ORDER BY name")->fetchAll();
 
 

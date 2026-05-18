@@ -35,7 +35,7 @@ $variantsStmt->execute([$id]);
 $variants = $variantsStmt->fetchAll();
 
 // Get all sizes and colors for dropdowns
-$sizes = $pdo->query("SELECT * FROM sizes ORDER BY sort_order, name")->fetchAll();
+$sizes = $pdo->query("SELECT * FROM sizes ORDER BY name")->fetchAll();
 $colors = $pdo->query("SELECT * FROM colors ORDER BY name")->fetchAll();
 
 // Get categories
