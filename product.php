@@ -45,8 +45,9 @@ foreach ($variants as $v) {
     }
     $variantMap[$v['color']][$v['size']] = $v['stock'];
 }
-// Get sizes as array
+// Get sizes as array and sort them properly
 $sizes = array_keys($sizes);
+$sizes = sortSizes($sizes);
 ?>
 
 <script>

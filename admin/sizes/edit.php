@@ -21,12 +21,11 @@ $error = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     requireCsrfToken();
     $name = trim($_POST['name']);
-    $sort_order = (int)($_POST['sort_order'] ?? 999);
     if ($name === '') {
         $error = "Size name is required.";
     } else {
-        $stmt = $pdo->prepare("UPDATE sizes SET name=?, sort_order=? WHERE id=?");
-        $stmt->execute([$name, $sort_order, $id]);
+        $stmt = $pdo->prepare("UPDATE sizes SET name=? WHERE id=?");
+        $stmt->execute([$name, $id]);
         redirect("list.php?msg=Size+updated");
     }
 }
@@ -42,12 +41,7 @@ require_once "../includes/header.php";
 <div class="form-group">
   <label for="name">Size Name</label>
   <input type="text" name="name" id="name" value="<?= sanitize($size['name']) ?>" required>
-</div>
-
-<div class="form-group">
-  <label for="sort_order">Display Order</label>
-  <input type="number" name="sort_order" id="sort_order" value="<?= $size['sort_order'] ?>" min="1" max="999" required>
-  <small style="color:#666;">Lower numbers appear first (e.g., S=1, M=2, L=3, XL=4, XXL=5)</small>
+  <small style="color:#666;">Size will be automatically sorted (e.g., S, M, L, XL, XXL)</small>
 </div>
 
 <div class="form-actions">

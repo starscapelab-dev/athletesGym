@@ -8,9 +8,23 @@ require_once __DIR__ . "/../includes/functions.php";
 require_once __DIR__ . '/../../includes/csrf.php';
 require_once __DIR__ . "/../includes/header.php";
 
-// Fetch sizes - ordered by sort_order for proper display (S, M, L, XL, XXL)
-$stmt = $pdo->query("SELECT * FROM sizes ORDER BY sort_order, name");
+// Fetch sizes - ordered properly (S, M, L, XL, XXL)
+$stmt = $pdo->query("SELECT * FROM sizes");
 $sizes = $stmt->fetchAll();
+// Sort sizes using custom function
+$sizeNames = array_column($sizes, 'name');
+$sortedNames = sortSizes($sizeNames);
+// Reorder sizes array based on sorted names
+$sortedSizes = [];
+foreach ($sortedNames as $name) {
+    foreach ($sizes as $size) {
+        if ($size['name'] === $name) {
+            $sortedSizes[] = $size;
+            break;
+        }
+    }
+}
+$sizes = $sortedSizes;
 ?>
 
 <div class="admin-page-header">
@@ -27,7 +41,6 @@ $sizes = $stmt->fetchAll();
     <tr>
       <th width="60">ID</th>
       <th>Name</th>
-      <th width="120">Display Order</th>
       <th width="160">Actions</th>
     </tr>
   </thead>
@@ -36,7 +49,6 @@ $sizes = $stmt->fetchAll();
       <tr>
         <td><?= $size['id'] ?></td>
         <td><?= sanitize($size['name']) ?></td>
-        <td><?= $size['sort_order'] ?></td>
         <td>
           <div class="actions">
             <a href="edit.php?id=<?= $size['id'] ?>" class="btn btn-edit">Edit</a>
