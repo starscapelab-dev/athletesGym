@@ -86,8 +86,28 @@ $email  = trim($_POST['email'] ?? ($_SESSION['user_email'] ?? ''));
 $country_code = trim($_POST['country_code'] ?? '+971');
 $phone  = trim($_POST['phone'] ?? '');
 $address = trim($_POST['address'] ?? '');
-$city    = trim($_POST['city'] ?? 'doha');
+$delivery_area_id = intval($_POST['delivery_area_id'] ?? 0);
 $country = trim($_POST['country'] ?? 'Qatar');
+
+// Validate delivery area and get shipping charge
+if ($delivery_area_id <= 0) {
+    $_SESSION['checkout_error'] = "Please select a delivery area.";
+    header("Location: checkout.php");
+    exit;
+}
+
+$deliveryStmt = $pdo->prepare("SELECT name, shipping_charge FROM delivery_areas WHERE id = ? AND is_active = 1");
+$deliveryStmt->execute([$delivery_area_id]);
+$deliveryArea = $deliveryStmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$deliveryArea) {
+    $_SESSION['checkout_error'] = "Invalid delivery area selected.";
+    header("Location: checkout.php");
+    exit;
+}
+
+$city = $deliveryArea['name'];
+$shipping = floatval($deliveryArea['shipping_charge']);
 
 // Format phone with country code
 $full_phone = $country_code . $phone;
@@ -97,7 +117,6 @@ $subtotal = 0;
 foreach ($items as $item) {
     $subtotal += $item['price'] * $item['quantity'];
 }
-$shipping = 0.00;
 $tax = 0.00;
 $total = $subtotal + $shipping + $tax;
 
@@ -130,13 +149,13 @@ try {
     // 3️⃣ Insert order
     $stmt = $pdo->prepare("
         INSERT INTO orders (
-            customer_id, session_id, full_name, email, phone, 
-            shipping_address, city, country, 
-            subtotal, tax, shipping_fee, total, 
-            payment_method, payment_status, order_status, 
+            customer_id, session_id, full_name, email, phone,
+            shipping_address, city, delivery_area_id, country,
+            subtotal, tax, shipping_fee, total,
+            payment_method, payment_status, order_status,
             created_at, updated_at
         ) VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW()
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW()
         )
     ");
     $stmt->execute([
@@ -147,6 +166,7 @@ try {
         $full_phone,
         $address,
         $city,
+        $delivery_area_id,
         $country,
         $subtotal,
         $tax,

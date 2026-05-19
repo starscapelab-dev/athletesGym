@@ -64,6 +64,10 @@ if (!$items) {
     require_once __DIR__ . "/layouts/footer.php"; exit;
 }
 
+// Fetch delivery areas
+$deliveryAreasStmt = $pdo->query("SELECT * FROM delivery_areas WHERE is_active = 1 ORDER BY shipping_charge ASC");
+$deliveryAreas = $deliveryAreasStmt->fetchAll(PDO::FETCH_ASSOC);
+
 // If logged in, prefill
 $name = $_SESSION['user_name'] ?? "";
 $email = $_SESSION['user_email'] ?? "";
@@ -184,6 +188,18 @@ $phone = $_SESSION['user_phone'] ?? "";
           </div>
 
           <div class="form-group">
+            <label for="delivery_area_id">Delivery Area *</label>
+            <select name="delivery_area_id" id="delivery_area_id" required>
+              <option value="">Select your area</option>
+              <?php foreach ($deliveryAreas as $area): ?>
+                <option value="<?= $area['id'] ?>" data-charge="<?= $area['shipping_charge'] ?>">
+                  <?= htmlspecialchars($area['name']) ?> - <?= number_format($area['shipping_charge'], 2) ?> QR
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label for="address">Address</label>
             <textarea name="address" id="address" placeholder="Street address, building, apartment" required></textarea>
           </div>
@@ -224,19 +240,43 @@ $phone = $_SESSION['user_phone'] ?? "";
         <div class="summary-footer">
           <div class="line">
             <span>Subtotal</span>
-            <span><?= number_format($grand, 2) ?> QR</span>
+            <span id="subtotalAmount"><?= number_format($grand, 2) ?> QR</span>
           </div>
-          <div class="line delivery-note">
-            <span style="font-size: 0.9em; color: #666;">Delivery charges will be borne by the customer.</span>
+          <div class="line">
+            <span>Shipping</span>
+            <span id="shippingAmount">Select area</span>
           </div>
           <div class="line total">
             <span>Total</span>
-            <span><?= number_format($grand, 2) ?> QR</span>
+            <span id="totalAmount"><?= number_format($grand, 2) ?> QR</span>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const deliveryAreaSelect = document.getElementById('delivery_area_id');
+  const shippingAmountSpan = document.getElementById('shippingAmount');
+  const totalAmountSpan = document.getElementById('totalAmount');
+  const subtotal = <?= $grand ?>;
+
+  deliveryAreaSelect.addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const shippingCharge = parseFloat(selectedOption.getAttribute('data-charge')) || 0;
+
+    if (shippingCharge > 0) {
+      shippingAmountSpan.textContent = shippingCharge.toFixed(2) + ' QR';
+      const total = subtotal + shippingCharge;
+      totalAmountSpan.textContent = total.toFixed(2) + ' QR';
+    } else {
+      shippingAmountSpan.textContent = 'Select area';
+      totalAmountSpan.textContent = subtotal.toFixed(2) + ' QR';
+    }
+  });
+});
+</script>
 
 <?php require_once __DIR__ . "/layouts/footer.php"; ?>
