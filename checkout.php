@@ -193,7 +193,7 @@ $phone = $_SESSION['user_phone'] ?? "";
               <option value="">Select your area</option>
               <?php foreach ($deliveryAreas as $area): ?>
                 <option value="<?= $area['id'] ?>" data-charge="<?= $area['shipping_charge'] ?>">
-                  <?= htmlspecialchars($area['name']) ?> - <?= number_format($area['shipping_charge'], 2) ?> QR
+                  <?= htmlspecialchars($area['name']) ?>
                 </option>
               <?php endforeach; ?>
             </select>
