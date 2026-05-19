@@ -74,13 +74,15 @@ foreach ($last7Days as $day) {
     $chartRevenue[] = round($day['revenue'], 2);
 }
 
-// Top 5 products by orders
+// Top 5 products by quantity sold (paid orders only)
 $topProducts = $pdo->query("SELECT
     p.name,
-    COUNT(oi.id) as order_count
+    SUM(oi.quantity) as order_count
     FROM products p
     JOIN order_items oi ON p.id = oi.product_id
-    GROUP BY p.id
+    JOIN orders o ON oi.order_id = o.id
+    WHERE o.payment_status = 'paid'
+    GROUP BY p.id, p.name
     ORDER BY order_count DESC
     LIMIT 5")->fetchAll();
 
@@ -217,7 +219,7 @@ $topProducts = $pdo->query("SELECT
             <div class="product-item">
               <span class="product-rank">#<?= $index + 1 ?></span>
               <span class="product-name"><?= htmlspecialchars($product['name']) ?></span>
-              <span class="product-orders"><?= $product['order_count'] ?> orders</span>
+              <span class="product-orders"><?= $product['order_count'] ?> sold</span>
             </div>
           <?php endforeach; ?>
         <?php endif; ?>
