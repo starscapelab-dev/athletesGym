@@ -77,12 +77,15 @@ foreach ($last7Days as $day) {
 // Top 5 products by quantity sold (paid orders only)
 $topProducts = $pdo->query("SELECT
     p.name,
-    SUM(oi.quantity) as order_count
+    COALESCE(SUM(oi.quantity), 0) as order_count
     FROM products p
     JOIN order_items oi ON p.id = oi.product_id
     JOIN orders o ON oi.order_id = o.id
     WHERE o.payment_status = 'paid'
+    AND oi.product_id IS NOT NULL
+    AND oi.quantity > 0
     GROUP BY p.id, p.name
+    HAVING order_count > 0
     ORDER BY order_count DESC
     LIMIT 5")->fetchAll();
 
