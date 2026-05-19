@@ -43,7 +43,8 @@ foreach ($variants as $v) {
     if (!isset($sizes[$v['size']])) {
         $sizes[$v['size']] = true;
     }
-    $variantMap[$v['color']][$v['size']] = $v['stock'];
+    // Use lowercase keys for case-insensitive lookup
+    $variantMap[strtolower($v['color'])][strtolower($v['size'])] = $v['stock'];
 }
 // Get sizes as array and sort them properly
 $sizes = array_keys($sizes);

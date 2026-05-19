@@ -313,7 +313,7 @@ const variantInput = document.querySelector('.variant');
 function updateStockStatus() {
     if (!selectedColor || !selectedSize) return;
 
-    const stock = variantMap[selectedColor]?.[selectedSize] ?? 0;
+    const stock = variantMap[selectedColor.toLowerCase()]?.[selectedSize.toLowerCase()] ?? 0;
     
     // ✅ Find and set variant ID
     const matchingVariant = variants.find(v => 

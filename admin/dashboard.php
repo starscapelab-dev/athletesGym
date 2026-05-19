@@ -18,14 +18,14 @@ $orderStats = $pdo->query("SELECT
     COUNT(*) as total_orders,
     COUNT(CASE WHEN order_status = 'pending' THEN 1 END) as pending_orders,
     COUNT(CASE WHEN order_status = 'processing' THEN 1 END) as processing_orders,
-    COUNT(CASE WHEN order_status = 'completed' THEN 1 END) as completed_orders,
+    COUNT(CASE WHEN order_status IN ('shipped', 'delivered') THEN 1 END) as completed_orders,
     COUNT(CASE WHEN order_status = 'cancelled' THEN 1 END) as cancelled_orders
     FROM orders")->fetch();
 
 // Sales Statistics - Only count paid orders
 $salesStats = $pdo->query("SELECT
     SUM(CASE WHEN payment_status = 'paid' THEN total ELSE 0 END) as total_revenue,
-    SUM(CASE WHEN order_status = 'completed' AND payment_status = 'paid' THEN total ELSE 0 END) as completed_revenue,
+    SUM(CASE WHEN order_status IN ('shipped', 'delivered') AND payment_status = 'paid' THEN total ELSE 0 END) as completed_revenue,
     AVG(CASE WHEN payment_status = 'paid' THEN total END) as avg_order_value
     FROM orders")->fetch();
 
