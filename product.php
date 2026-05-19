@@ -24,12 +24,12 @@ $images = $images->fetchAll(PDO::FETCH_COLUMN);
 
 // Variants
 $variantsStmt = $pdo->prepare("
-    SELECT v.id, c.name AS color, s.name AS size, v.stock, s.sort_order
+    SELECT v.id, c.name AS color, s.name AS size, v.stock
     FROM product_variants v
     JOIN colors c ON v.color_id = c.id
     JOIN sizes s ON v.size_id = s.id
     WHERE v.product_id = ?
-    ORDER BY c.name, s.sort_order, s.name
+    ORDER BY c.name, s.name
 ");
 $variantsStmt->execute([$id]);
 $variants = $variantsStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -39,14 +39,13 @@ $sizes = [];
 $variantMap = [];
 foreach ($variants as $v) {
     $colors[$v['color']] = true;
-    // Store size with its sort_order to maintain proper ordering
+    // Store size to maintain proper ordering
     if (!isset($sizes[$v['size']])) {
-        $sizes[$v['size']] = $v['sort_order'];
+        $sizes[$v['size']] = true;
     }
     $variantMap[$v['color']][$v['size']] = $v['stock'];
 }
-// Sort sizes by their sort_order value
-asort($sizes);
+// Get sizes as array
 $sizes = array_keys($sizes);
 ?>
 
