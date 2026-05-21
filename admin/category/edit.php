@@ -84,6 +84,7 @@ require_once __DIR__ . "/../includes/header.php";
   <label for="gender">Category Type</label>
   <select name="gender" id="gender" required>
       <option value="Men" <?= $categories['gender'] === 'Men' ? 'selected' : '' ?>>Men</option>
+      <option value="Unisex" <?= $categories['gender'] === 'Unisex' ? 'selected' : '' ?>>Unisex</option>
       <option value="Women" <?= $categories['gender'] === 'Women' ? 'selected' : '' ?>>Women</option>
       <option value="Accessories" <?= $categories['gender'] === 'Accessories' ? 'selected' : '' ?>>Accessories (Unisex)</option>
   </select>

@@ -77,6 +77,7 @@ require_once __DIR__ . "/../includes/header.php";
   <label for="gender">Category Type</label>
   <select name="gender" id="gender" required>
       <option value="Men">Men</option>
+      <option value="Unisex">Unisex</option>
       <option value="Women">Women</option>
       <option value="Accessories" selected>Accessories (Unisex)</option>
   </select>
