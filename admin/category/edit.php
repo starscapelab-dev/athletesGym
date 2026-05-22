@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // ✅ Delete old file if extension changed
         if (!empty($categories['image'])) {
-            $oldFile = __DIR__ . "/../../" . $category['image'];
+            $oldFile = __DIR__ . "/../../" . $categories['image'];
             if (file_exists($oldFile) && $oldFile !== $targetPath) {
                 unlink($oldFile);
             }
