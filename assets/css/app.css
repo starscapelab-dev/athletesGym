@@ -5345,7 +5345,7 @@ iframe .ytp-watermark {
   }
   .shop-title {
     text-align: center;
-    margin: 0 0 40px 0;
+    margin: 40px 0 40px 0;
     font-size: 2.5rem;
     font-weight: 700;
     font-family: 'Rajdhani', sans-serif;
@@ -5357,12 +5357,14 @@ iframe .ytp-watermark {
   @media only screen and (max-width: 1199px) {
     .shop-title {
       font-size: 2.2rem;
+      margin-top: 30px;
     }
   }
 
   @media only screen and (max-width: 767px) {
     .shop-title {
       font-size: 2rem;
+      margin-top: 25px;
       margin-bottom: 30px;
     }
   }
@@ -5370,6 +5372,7 @@ iframe .ytp-watermark {
   @media only screen and (max-width: 575px) {
     .shop-title {
       font-size: 1.8rem;
+      margin-top: 20px;
       margin-bottom: 25px;
     }
   }
@@ -5379,6 +5382,10 @@ iframe .ytp-watermark {
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     margin-bottom: 40px;
+    justify-items: center;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   @media (max-width: 1199px) {
@@ -5406,6 +5413,8 @@ iframe .ytp-watermark {
     overflow: hidden;
     transition: transform 0.2s ease;
     background: #fff;
+    width: 100%;
+    max-width: 300px;
   }
   
   .category-card:hover {
