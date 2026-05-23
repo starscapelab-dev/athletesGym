@@ -128,7 +128,7 @@ $items = getGuestCartItems($pdo);
             <span><?= number_format($grandTotal, 2) ?> QR</span>
           </div>
           <div class="summary-line" style="color: #666; font-size: 0.9em;">
-            <span>Delivery charges will be borne by the customer.</span>
+            <span>Shipping charges will be calculated at checkout.</span>
           </div>
           <div class="summary-total">
             <span>Total</span>

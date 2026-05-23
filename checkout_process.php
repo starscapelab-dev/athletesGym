@@ -226,6 +226,15 @@ try {
         ]);
     }
 
+    // Add shipping charge as a separate invoice item
+    if ($shipping > 0) {
+        $invoiceItems[] = [
+            'ItemName'   => 'Shipping - ' . $city,
+            'Quantity'   => 1,
+            'UnitPrice'  => $shipping
+        ];
+    }
+
     // 5️⃣ DON'T clear cart yet - only clear after successful payment
     // clearCart($pdo); // Moved to callback.php after payment confirmation
 
