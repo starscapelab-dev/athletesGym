@@ -22,14 +22,14 @@ require_auth();
         <div class="overlay">Men</div>
       </a>
 
-      <a href="shop_categories.php?gender=Unisex" class="gender-card unisex">
-        <img src="<?= BASE_URL ?>assets/pic/hoodie/DSC04487.png" alt="Unisex">
-        <div class="overlay">Unisex</div>
-      </a>
-
       <a href="shop_categories.php?gender=Accessories" class="gender-card accessories">
         <img src="<?= BASE_URL ?>assets/pic/socks/SGE08828.png" alt="Accessories">
         <div class="overlay">Accessories</div>
+      </a>
+
+      <a href="shop_categories.php?gender=Unisex" class="gender-card unisex">
+        <img src="<?= BASE_URL ?>assets/pic/hoodie/DSC04487.png" alt="Unisex">
+        <div class="overlay">Unisex</div>
       </a>
     </div>
   </div>
