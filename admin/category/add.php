@@ -14,7 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     requireCsrfToken();
     $name = trim($_POST['name']);
     $gender = $_POST["gender"] ?? 'Accessories';
-    $slug = strtolower(preg_replace('/[^a-z0-9]+/', '-', $name));
+    $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $name));
+    $slug = trim($slug, '-'); // Remove leading/trailing dashes
 
     $imagePath = null;
 

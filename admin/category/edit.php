@@ -25,7 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
     $gender = $_POST['gender'] ?? 'Accessories';
 
-    $slug = strtolower(preg_replace('/[^a-z0-9]+/', '-', $name));
+    $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $name));
+    $slug = trim($slug, '-'); // Remove leading/trailing dashes
 
 
     $imagePath = $categories['image'] ; // keep old image if no new upload
