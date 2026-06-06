@@ -34,7 +34,7 @@ require_once __DIR__ . "/config.php";
     <link rel="stylesheet" href="<?= BASE_URL ?>assets/vendors/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>assets/vendors/css/swiper.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>assets/vendors/css/animate.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/app.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/app.css?v=<?= filemtime(__DIR__ . '/../assets/css/app.css') ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
