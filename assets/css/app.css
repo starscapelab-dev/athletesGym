@@ -17,31 +17,31 @@
     }
 }
 
-/* @font-face {
+@font-face {
     font-family: "Orbitron-VariableFont_wght";
-    src: url("../fonts/Orbitron/Orbitron-VariableFont_wght.woff2") format("woff2"), url("../fonts/Orbitron/Orbitron-VariableFont_wght.woff") format("woff");
+    src: url("../fonts/Orbitron/Orbitron-VariableFont_wght.woff2?v=3") format("woff2"), url("../fonts/Orbitron/Orbitron-VariableFont_wght.woff?v=3") format("woff");
     font-weight: 100 900;
     font-style: normal;
-    font-display: swap
+    font-display: swap;
 }
 
 @font-face {
     font-family: "Nunito-VariableFont_wght";
-    src: url("../fonts/Nunito/Nunito-VariableFont_wght.woff2") format("woff2"), url("../fonts/Nunito/Nunito-VariableFont_wght.woff") format("woff");
+    src: url("../fonts/Nunito/Nunito-VariableFont_wght.woff2?v=3") format("woff2"), url("../fonts/Nunito/Nunito-VariableFont_wght.woff?v=3") format("woff");
     font-weight: 100 900;
     font-style: normal;
-    font-display: swap
+    font-display: swap;
 }
 
 @font-face {
     font-family: "DMSerifDisplay-Italic";
-    src: url("../fonts/DMSerifDisplay-Italic/DMSerifDisplay-Italic.woff2") format("woff2"), url("../fonts/DMSerifDisplay-Italic/DMSerifDisplay-Italic.woff") format("woff");
+    src: url("../fonts/DMSerifDisplay-Italic/DMSerifDisplay-Italic.woff2?v=3") format("woff2"), url("../fonts/DMSerifDisplay-Italic/DMSerifDisplay-Italic.woff?v=3") format("woff");
     font-weight: 400;
     font-style: normal;
-    font-display: swap
-} */
+    font-display: swap;
+}
 
-@font-face {
+/* @font-face {
     font-family: "Orbitron-VariableFont_wght";
     src: url("../fonts/Optician/optician-sans.regular.ttf?v=2");
     font-weight: 100 900;
@@ -63,7 +63,7 @@
     font-weight: 400;
     font-style: normal;
     font-display: swap;
-}
+} */
 
 body {
     font-family: "Inter", sans-serif;
@@ -5348,7 +5348,6 @@ iframe .ytp-watermark {
     margin: 40px 0 40px 0;
     font-size: 2.5rem;
     font-weight: 700;
-    font-family: 'Rajdhani', sans-serif;
     color: #000;
     text-transform: uppercase;
     letter-spacing: 1px;
