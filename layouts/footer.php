@@ -1,7 +1,7 @@
     <!-- Footer Start -->
     <footer>
         <div style="background: #e5e8e9;" class="container-fluid pt-3 pb-3">
-            <h3 style="font-size:35px" class="text-center"><a style="text-decoration: none;color: #000;" href="https://www.instagram.com/athletesqa/" target="_blank">Follow US @Athletesqa</a></h3>
+            <h3 style="font-size:35px" class="text-center"><a style="text-decoration: none;color: #000;" href="https://www.instagram.com/athletesqa/" target="_blank">Follow US @Athletesqa.</a></h3>
         </div>
         <div class="container">
             <div class="footer-cta-block">
