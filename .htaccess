@@ -30,6 +30,20 @@ Options -Indexes
     AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
 </IfModule>
 
+# Disable LiteSpeed server-side page cache
+<IfModule LiteSpeed>
+    CacheDisable public /
+</IfModule>
+
+# No caching for PHP pages (dynamic content)
+<FilesMatch "\.php$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "Thu, 01 Jan 1970 00:00:00 GMT"
+    </IfModule>
+</FilesMatch>
+
 # Browser Caching
 <IfModule mod_expires.c>
     ExpiresActive On
