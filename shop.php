@@ -28,7 +28,7 @@ require_auth();
       </a>
 
       <a href="shop_categories.php?gender=Unisex" class="gender-card unisex">
-        <img src="<?= BASE_URL ?>assets/pic/hoodie/DSC04487.png" alt="Unisex">
+        <img src="<?= BASE_URL ?>assets/pic/hoodie/DSC04512.png" alt="Unisex">
         <div class="overlay">Unisex</div>
       </a>
     </div>
