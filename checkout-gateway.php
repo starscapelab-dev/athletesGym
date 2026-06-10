@@ -87,7 +87,7 @@ unset($_SESSION['login_error']);
   text-align: center;
   margin-bottom: 10px;
   color: #1a2233;
-  font-family: "Orbitron-VariableFont_wght";
+  font-family: "Inter", sans-serif;
 }
 
 .gateway-subtitle {
@@ -136,7 +136,7 @@ unset($_SESSION['login_error']);
   font-size: 1.5em;
   margin-bottom: 15px;
   color: #1a2233;
-  font-family: "Orbitron-VariableFont_wght";
+  font-family: "Inter", sans-serif;
 }
 
 .gateway-card p {
@@ -156,7 +156,7 @@ unset($_SESSION['login_error']);
   border: none;
   cursor: pointer;
   font-size: 16px;
-  font-family: "Orbitron-VariableFont_wght";
+  font-family: "Inter", sans-serif;
 }
 
 .btn-primary {

@@ -51,28 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Admin Login - Athletes Gym</title>
     <link rel="stylesheet" href="<?= BASE_URL ?>auth/auth.css">
     <style>
-        @font-face {
-            font-family: "Orbitron-VariableFont_wght";
-            src: url("<?= BASE_URL ?>assets/fonts/Optician/optician-sans.regular.ttf");
-            font-weight: 100 900;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: "Nunito-VariableFont_wght";
-            src: url("<?= BASE_URL ?>assets/fonts/Optician/optician-sans.regular.ttf");
-            font-weight: 100 900;
-            font-style: normal;
-            font-display: swap;
-        }
-
         body {
-            font-family: "Nunito-VariableFont_wght", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            font-family: "Inter", sans-serif;
         }
 
         h1, h2, h3, h4, h5, h6 {
-            font-family: "Orbitron-VariableFont_wght", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            font-family: "Inter", sans-serif;
         }
 
         .admin-badge {

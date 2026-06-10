@@ -47,7 +47,7 @@ require_once __DIR__ . "/layouts/header-item.php";
     }
 
     .error-404-code {
-        font-family: "Orbitron-VariableFont_wght", sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 180px;
         font-weight: 900;
         background: linear-gradient(135deg, #ffffff 0%, #999999 100%);
@@ -67,7 +67,7 @@ require_once __DIR__ . "/layouts/header-item.php";
     }
 
     .error-404-title {
-        font-family: "Orbitron-VariableFont_wght", sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 38px;
         font-weight: 700;
         color: #ffffff;
@@ -162,7 +162,7 @@ require_once __DIR__ . "/layouts/header-item.php";
     }
 
     .error-404-suggestions h3 {
-        font-family: "Orbitron-VariableFont_wght", sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 24px;
         color: #ffffff;
         margin-bottom: 30px;
