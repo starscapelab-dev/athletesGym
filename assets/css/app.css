@@ -652,7 +652,7 @@ header.fixed-menu {
     width: 100%;
     height: 550px;
     border-radius: 12px;
-    object-fit: contain;
+    object-fit: cover;
     background: #f6f6f6;
     box-shadow: 0 2px 16px #0001;
 }
